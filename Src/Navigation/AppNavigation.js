@@ -1,11 +1,11 @@
 import { NavigationContainer } from "@react-navigation/native";
-import AuthNavegacion from "../../../Appclub/Src/Navigation/AuthNavegacion";
-
+import AuthNavigation from "./AuthNavigation";
+import MainNavigation from "./MainNavigation";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, {useState, useEffect, useRef, use} from "react";
 import { ActivityIndicator, View, StyleSheet, AppState } from "react-native";
 
-export default function AppNavegacion() {
+export default function AppNavigation () {
     const [isLoading, setIsLoading] = useState(true);
     const [userToken, setUserToken] = useState(null);
     const appState = useRef(AppState.currentState);
@@ -51,7 +51,7 @@ export default function AppNavegacion() {
 
     return (
         <NavigationContainer>
-            {userToken ? <NavegacionPrincipal /> : <AuthNavegacion /> }
+            {userToken ? <MainNavigation /> : <AuthNavigation /> }
         </NavigationContainer>
     );
 }

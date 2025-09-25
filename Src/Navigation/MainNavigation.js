@@ -2,9 +2,9 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons, Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 
 const Tab = createBottomTabNavigator();
-import InicioStack from "../../../Appclub/Src/Navigation/Stack/InicioStack"
-import PerfilScreen from "../../../Appclub/Screen/Perfil/PerfilScreen";
-import ConfiguracionScreen from "../../../Appclub/Screen/Configuracion/ConfiguracionScreen";
+import InicioStack from "../../Src/Navigation/Stack/InicioStack"
+import PerfilScreen from "../../Screen/Perfil/PerfilScreen";
+import ConfiguracionScreen from "../../Screen/Configuracion/ConfiguracionScreen";
 
 export default function MainNavigation() {
     return(

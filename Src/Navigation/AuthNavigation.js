@@ -1,10 +1,10 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import LoginScreen from "../../../Appclub/Screen/Auth/LoginScreen";
-import RegistroScreen from "../../../Appclub/Screen/Auth/RegistroScreen";
+import LoginScreen from "../../Screen/Auth/LoginScreen"
+import RegistroScreen from "../../Screen/Auth/RegistroScreen";
 
 const stack = createNativeStackNavigator();
 
-export default function AuthNavegacion(){
+export default function AuthNavigation(){
     return(
         <stack.Navigator>
             <stack.Screen
