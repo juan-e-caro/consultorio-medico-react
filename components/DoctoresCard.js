@@ -1,13 +1,14 @@
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-export default function UsuariosCard({ usuarios, onEdit, onDelete }) {
+export default function DoctoresCard({ doctor, onEdit, onDelete }) {
     return (
         <View style={styles.card}>
             <View style={styles.info}>
-                <Text style={styles.nombre}>{usuarios.nombre}</Text>
-                <Text style={styles.email}>{usuarios.email}</Text>
-                <Text style={styles.rol}>Rol: {usuarios.rol}</Text>
+                <Text style={styles.nombre}>{doctor.usuario?.nombre || "Nombre no disponible"}</Text>
+                <Text style={styles.especialidad}>Especialidad: {doctor.especialidad?.nombre || "No especificada"}</Text>
+                <Text style={styles.detalle}>Cédula: {doctor.cedula}</Text>
+                <Text style={styles.detalle}>Teléfono: {doctor.telefono}</Text>
             </View>
             <View style={styles.actions}>
                 <TouchableOpacity onPress={onEdit} style={styles.iconBtn}>
@@ -25,7 +26,7 @@ const styles = StyleSheet.create({
     card: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'center',
+        alignItems: 'flex-start',
         backgroundColor: '#FFFFFF',
         padding: 16,
         marginVertical: 8,
@@ -45,14 +46,14 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#1A237E',
     },
-    email: {
-        fontSize: 14,
-        color: '#455A64',
-        marginTop: 4,
-    },
-    rol: {
+    especialidad: {
         fontSize: 14,
         color: '#388E3C',
+        marginTop: 4,
+    },
+    detalle: {
+        fontSize: 14,
+        color: '#455A64',
         marginTop: 2,
     },
     actions: {

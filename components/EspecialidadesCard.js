@@ -1,13 +1,12 @@
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-export default function UsuariosCard({ usuarios, onEdit, onDelete }) {
+export default function EspecialidadesCard({ especialidad, onEdit, onDelete }) {
     return (
         <View style={styles.card}>
             <View style={styles.info}>
-                <Text style={styles.nombre}>{usuarios.nombre}</Text>
-                <Text style={styles.email}>{usuarios.email}</Text>
-                <Text style={styles.rol}>Rol: {usuarios.rol}</Text>
+                <Text style={styles.nombre}>{especialidad.nombre}</Text>
+                <Text style={styles.descripcion}>{especialidad.descripcion}</Text>
             </View>
             <View style={styles.actions}>
                 <TouchableOpacity onPress={onEdit} style={styles.iconBtn}>
@@ -45,15 +44,10 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#1A237E',
     },
-    email: {
+    descripcion: {
         fontSize: 14,
         color: '#455A64',
         marginTop: 4,
-    },
-    rol: {
-        fontSize: 14,
-        color: '#388E3C',
-        marginTop: 2,
     },
     actions: {
         flexDirection: 'row',

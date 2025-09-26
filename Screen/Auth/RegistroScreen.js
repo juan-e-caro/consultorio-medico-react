@@ -5,7 +5,6 @@ import React, { useState } from 'react'
 export default function RegistroScreen({ navigation }) {
     const [nombre, setNombre] = useState("");
     const [email, setEmail] = useState("");
-    const [telefono, setTelefono] = useState("");
     const [password, setPassword] = useState("");
     const [confirmarPassword, setConfirmarPassword] = useState("");
 
@@ -26,13 +25,6 @@ export default function RegistroScreen({ navigation }) {
                 onChangeText={setEmail}
                 keyboardType='email-address'
                 autoCapitalize='none'
-            />
-            <TextInput
-                style={styles.input}
-                placeholder='Teléfono'
-                value={telefono}
-                onChangeText={setTelefono}
-                keyboardType='phone-pad'
             />
             <TextInput
                 style={styles.input}
