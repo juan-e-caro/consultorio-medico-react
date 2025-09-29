@@ -1,45 +1,35 @@
 import { useState } from "react";
-import {View,Text,TextInput,StyleSheet,TouchableOpacity,Alert,ActivityIndicator,ScrollView,KeyboardAvoidingView,Platform,} from "react-native";
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, ActivityIndicator, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { crearUsuarios, EditarUsuarios } from "../../Src/Services/UsuariosServive";
 
-export default function EditarUsuariosScreen() {
-  const navigation = useNavigation();
-  const route = useRoute();
-
+export default function EditarUsuario({ navigation, route }) {
   const usuario = route.params?.usuario;
 
   const [nombre, setNombre] = useState(usuario ? usuario.nombre : "");
   const [email, setEmail] = useState(usuario ? usuario.email : "");
-  const [password, setPassword] = useState(usuario ? usuario.password : "");
+  const [password, setPassword] = useState("");
   const [rol, setRol] = useState(usuario ? usuario.rol : "");
   const [loading, setLoading] = useState(false);
 
   const esEdicion = !!usuario;
 
-  const HandleGuardar = async () => {
-    if (!nombre || !email || !password || !rol) {
+  const handleGuardar = async () => {
+    if (!nombre || !email || !rol) {
       Alert.alert("Campos requeridos", "Por favor completa todos los campos");
       return;
     }
 
     setLoading(true);
     try {
+      const payload = { nombre, email, rol };
+      if (password) payload.password = password;
+
       let result;
       if (esEdicion) {
-        result = await EditarUsuarios(usuario.id, {
-          nombre,
-          email,
-          password,
-          rol,
-        });
+        result = await EditarUsuarios(usuario.id, payload);
       } else {
-        result = await crearUsuarios({
-          nombre,
-          email,
-          password,
-          rol,
-        });
+        result = await crearUsuarios(payload);
       }
 
       if (result.success) {
@@ -53,6 +43,10 @@ export default function EditarUsuariosScreen() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleCancelar = () => {
+    navigation.navigate("ListarUsuarios");
   };
 
   return (
@@ -78,7 +72,7 @@ export default function EditarUsuariosScreen() {
 
         <TextInput
           style={styles.input}
-          placeholder="Contraseña"
+          placeholder="Contraseña (dejar en blanco para no cambiar)"
           secureTextEntry
           value={password}
           onChangeText={setPassword}
@@ -102,9 +96,15 @@ export default function EditarUsuariosScreen() {
         {loading ? (
           <ActivityIndicator size="large" color="#0000ff" style={{ marginTop: 20 }} />
         ) : (
-          <TouchableOpacity style={styles.botonGuardar} onPress={HandleGuardar}>
-            <Text style={styles.botonText}>{esEdicion ? "Actualizar" : "Guardar"}</Text>
-          </TouchableOpacity>
+          <>
+            <TouchableOpacity style={styles.botonGuardar} onPress={handleGuardar}>
+              <Text style={styles.botonText}>{esEdicion ? "Actualizar" : "Guardar"}</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.botonCancelar} onPress={handleCancelar}>
+              <Text style={styles.botonTextCancelar}>Cancelar</Text>
+            </TouchableOpacity>
+          </>
         )}
       </ScrollView>
     </KeyboardAvoidingView>
@@ -164,8 +164,20 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 8,
     alignItems: "center",
+    marginBottom: 10,
   },
   botonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  botonCancelar: {
+    backgroundColor: "#D32F2F",
+    padding: 15,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  botonTextCancelar: {
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",

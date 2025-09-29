@@ -1,12 +1,39 @@
-import { View, Text, TextInput, StyleSheet } from 'react-native'
-import BottonComponent from '../../components/BottonComponent'
-import React, { useState } from 'react'
+import { View, Text, TextInput, StyleSheet, Alert, ActivityIndicator } from 'react-native';
+import BottonComponent from '../../components/BottonComponent';
+import React, { useState } from 'react';
+import { registerUser } from '../../Src/Services/AuthService'; // Ajusta la ruta
 
 export default function RegistroScreen({ navigation }) {
     const [nombre, setNombre] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmarPassword, setConfirmarPassword] = useState("");
+    const [loading, setLoading] = useState(false);
+
+    const handleRegister = async () => {
+        if (!nombre.trim() || !email.trim() || !password.trim() || !confirmarPassword.trim()) {
+            Alert.alert("Error", "Por favor completa todos los campos.");
+            return;
+        }
+
+        if(password !== confirmarPassword){
+            Alert.alert("Error", "Las contraseñas no coinciden.");
+            return;
+        }
+
+        setLoading(true);
+
+        const result = await registerUser(nombre, email, password, confirmarPassword);
+
+        setLoading(false);
+
+        if(result.success){
+            Alert.alert("Registro exitoso", "Usuario registrado correctamente.");
+            navigation.replace("login"); // o navega a login
+        } else {
+            Alert.alert("Error al registrar", result.message?.message || result.message);
+        }
+    };
 
     return (
         <View style={styles.container}>
@@ -17,6 +44,7 @@ export default function RegistroScreen({ navigation }) {
                 placeholder='Nombre completo'
                 value={nombre}
                 onChangeText={setNombre}
+                editable={!loading}
             />
             <TextInput
                 style={styles.input}
@@ -25,6 +53,7 @@ export default function RegistroScreen({ navigation }) {
                 onChangeText={setEmail}
                 keyboardType='email-address'
                 autoCapitalize='none'
+                editable={!loading}
             />
             <TextInput
                 style={styles.input}
@@ -32,6 +61,7 @@ export default function RegistroScreen({ navigation }) {
                 secureTextEntry
                 value={password}
                 onChangeText={setPassword}
+                editable={!loading}
             />
             <TextInput
                 style={styles.input}
@@ -39,19 +69,26 @@ export default function RegistroScreen({ navigation }) {
                 secureTextEntry
                 value={confirmarPassword}
                 onChangeText={setConfirmarPassword}
+                editable={!loading}
             />
 
             <BottonComponent
-                title="Registrarse"
-                onPress={() => console.log("registro")}
+                title={loading ? "" : "Registrarse"}
+                onPress={handleRegister}
+                style={{ backgroundColor: "#1976D2" }}
             />
+
+            {loading && <ActivityIndicator size="large" color="#0D47A1" style={{ marginTop: 16 }} />}
+
             <BottonComponent
                 title="Iniciar sesión"
-                onPress={() => console.log("login")}
+                onPress={() => navigation.navigate("login")}
+                style={{ backgroundColor: "#4CAF50", marginTop: 16 }}
             />
         </View>
     )
 }
+
 
 const styles = StyleSheet.create({
     container: {
