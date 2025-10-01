@@ -90,6 +90,7 @@ export default function RegistroScreen({ navigation }) {
 }
 
 
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,

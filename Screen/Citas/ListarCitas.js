@@ -1,47 +1,47 @@
 import { View, Text, FlatList, ActivityIndicator, TouchableOpacity, StyleSheet, Alert, Button } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useEffect, useState } from "react";
-import { listarUsuarios, eliminarUsuarios } from "../../Src/Services/UsuariosServive";
-import UsuariosCard from "../../components/UsuariosCard";
+import { listarCitas, eliminarCitas } from "../../Src/Services/CitasService";
+import CitasCard from "../../components/CitasCard";
 
-export default function ListarUsuarios() {
-    const [usuarios, setUsuarios] = useState([]);
+export default function ListarCitas() {
+    const [citas, setCitas] = useState([]);
     const [loading, setLoading] = useState(true);
     const navigation = useNavigation();
 
-    const handleUsuarios = async () => {
+    const handleCitas = async () => {
         setLoading(true);
         try {
-            const result = await listarUsuarios();
+            const result = await listarCitas();
             if(result.success){
-                setUsuarios(result.data);
+                setCitas(result.data);
             } else {
-                Alert.alert("Error", result.message || "No se pudieron cargar los usuarios");
+                Alert.alert("Error", result.message || "No se pudieron cargar las citas");
             }
         } catch (error) {
-            Alert.alert("Error", "No se pudieron cargar los usuarios");
+            Alert.alert("Error", "No se pudieron cargar los citas");
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        const unsubscribe = navigation.addListener('focus', handleUsuarios);
+        const unsubscribe = navigation.addListener('focus', handleCitas);
         return () => unsubscribe();
     }, [navigation]);
 
-    const handleEditar = (usuario) => {
-        navigation.navigate("EditarUsuarios", { usuario });
+    const handleEditar = (citas) => {
+        navigation.navigate("EditarCitas", { citas });
     };
 
     const handleCrear = () => {
-        navigation.navigate("EditarUsuarios");
+        navigation.navigate("EditarCitas");
     };
 
     const handleEliminar = (id) => {
         Alert.alert(
             "Confirmar eliminación",
-            "¿Estás seguro de que deseas eliminar este usuario?",
+            "¿Estás seguro de que deseas eliminar esta cita?",
             [
                 { text: "Cancelar", style: "cancel" },
                 { 
@@ -49,14 +49,14 @@ export default function ListarUsuarios() {
                     style: "destructive",
                     onPress: async () => {
                         try {
-                            const result = await eliminarUsuarios(id);
+                            const result = await eliminarCitas(id);
                             if(result.success){
-                                handleUsuarios();
+                                handleCitas();
                             } else {
-                                Alert.alert("Error", result.message || "No se pudo eliminar el usuario");
+                                Alert.alert("Error", result.message || "No se pudo eliminar la cita");
                             }
                         } catch (error) {
-                            Alert.alert("Error", "No se pudo eliminar el usuario");
+                            Alert.alert("Error", "No se pudo eliminar la cita");
                         }
                     }
                 }
@@ -75,21 +75,21 @@ export default function ListarUsuarios() {
     return (
         <View style={{ flex: 1 }}>
             <FlatList
-                data={usuarios}
+                data={citas}
                 keyExtractor={(item) => item.id.toString()}
                 renderItem={({ item }) => (
-                    <UsuariosCard
-                        usuario={item}
+                    <CitasCard
+                        cita={item}
                         onEdit={() => handleEditar(item)}
                         onDelete={() => handleEliminar(item.id)}
                     />
                 )}
-                ListEmptyComponent={<Text style={styles.empty}>No hay usuarios registrados</Text>}
+                ListEmptyComponent={<Text style={styles.empty}>No hay citas registradas</Text>}
             />
 
             <View style={styles.botonesContainer}>
                 <TouchableOpacity style={styles.botonCrear} onPress={handleCrear}>
-                    <Text style={styles.textoBoton}>+ Nuevo Usuario</Text>
+                    <Text style={styles.textoBoton}>Nueva Cita</Text>
                 </TouchableOpacity>
 
                 <Button

@@ -1,14 +1,14 @@
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-export default function DoctoresCard({ doctor, onEdit, onDelete }) {
+export default function doctoresesCard({ doctores, onEdit, onDelete }) {
     return (
         <View style={styles.card}>
             <View style={styles.info}>
-                <Text style={styles.nombre}>{doctor.usuario?.nombre || "Nombre no disponible"}</Text>
-                <Text style={styles.especialidad}>Especialidad: {doctor.especialidad?.nombre || "No especificada"}</Text>
-                <Text style={styles.detalle}>Cédula: {doctor.cedula}</Text>
-                <Text style={styles.detalle}>Teléfono: {doctor.telefono}</Text>
+                <Text style={styles.nombre}>{doctores.usuario?.nombre || "Nombre no disponible"}</Text>
+                <Text style={styles.especialidad}>Especialidad: {doctores.especialidad?.nombre || "No especificada"}</Text>
+                <Text style={styles.detalle}>Cédula: {doctores.cedula}</Text>
+                <Text style={styles.detalle}>Teléfono: {doctores.telefono}</Text>
             </View>
             <View style={styles.actions}>
                 <TouchableOpacity onPress={onEdit} style={styles.iconBtn}>

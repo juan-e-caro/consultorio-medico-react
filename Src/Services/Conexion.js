@@ -2,7 +2,7 @@ import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Cambia esta URL por la de tu backend Laravel
-const API_BASE_URL = "http://192.168.1.7:8000/api"; 
+const API_BASE_URL = "http://10.2.234.43:8000/api"; 
 
 const api = axios.create({
   baseURL: API_BASE_URL,

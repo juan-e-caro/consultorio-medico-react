@@ -3,7 +3,7 @@ import { Ionicons } from "@expo/vector-icons";
 
 export default function CitasCard({ cita, onEdit, onDelete }) {
     const nombrePaciente = cita.paciente?.usuario?.nombre || "Paciente no disponible";
-    const nombreDoctor = cita.doctor?.usuario?.nombre || "Doctor no disponible";
+    const nombredoctores = cita.doctores?.usuario?.nombre || "doctores no disponible";
     const horaInicio = cita.horario?.horaInicio || "??:??";
     const horaFin = cita.horario?.horaFin || "??:??";
 
@@ -11,7 +11,7 @@ export default function CitasCard({ cita, onEdit, onDelete }) {
         <View style={styles.card}>
             <View style={styles.info}>
                 <Text style={styles.nombre}>{nombrePaciente}</Text>
-                <Text style={styles.detalle}>Doctor: {nombreDoctor}</Text>
+                <Text style={styles.detalle}>doctores: {nombredoctores}</Text>
                 <Text style={styles.detalle}>Fecha: {formatearFecha(cita.fecha)}</Text>
                 <Text style={styles.detalle}>Horario: {horaInicio} - {horaFin}</Text>
                 <Text style={[styles.estado, getEstadoStyle(cita.estado)]}>

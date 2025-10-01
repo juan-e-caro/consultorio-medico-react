@@ -1,65 +1,50 @@
 import { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  StyleSheet,
-  TouchableOpacity,
-  Alert,
-  ActivityIndicator,
-  ScrollView,
-  KeyboardAvoidingView,
-  Platform,
-} from "react-native";
-import { crearUsuarios, EditarUsuarios } from "../../Src/Services/UsuariosServive";
+import {View,Text,TextInput,StyleSheet,TouchableOpacity,Alert,ActivityIndicator,ScrollView,KeyboardAvoidingView,Platform,} from "react-native";
+import { crearPaciente, EditarPaciente } from "../../Src/Services/PacientesService";
 
-export default function EditarUsuario({ navigation, route }) {
-  const usuario = route.params?.usuario;
+export default function EditarPacientes({ navigation, route }) {
+  const paciente = route.params?.paciente;
 
-  const [nombre, setNombre] = useState(usuario ? usuario.nombre : "");
-  const [email, setEmail] = useState(usuario ? usuario.email : "");
-  const [password, setPassword] = useState("");
-  const [rol, setRol] = useState(usuario ? usuario.rol : "");
+  const [nombre, setNombre] = useState(paciente ? paciente.nombre : "");
+  const [documento, setDocumento] = useState(paciente ? paciente.documento : "");
+  const [telefono, setTelefono] = useState(paciente ? paciente.telefono : "");
+  const [direccion, setDireccion] = useState(paciente ? paciente.direccion : "");
+  const [nacimiento, setNacimiento] = useState(paciente ? paciente.nacimiento : "");
+  const [genero, setGenero] = useState(paciente ? paciente.genero : "");
   const [loading, setLoading] = useState(false);
 
-  const esEdicion = !!usuario;
+  const esEdicion = !!paciente;
 
   const handleGuardar = async () => {
-    if (!nombre || !email || !rol) {
+    if (!nombre || !documento || !telefono || !direccion || !nacimiento || !genero) {
       Alert.alert("Campos requeridos", "Por favor completa todos los campos");
-      return;
-    }
-
-    // Validación básica de correo
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      Alert.alert("Correo inválido", "Por favor ingresa un correo válido");
       return;
     }
 
     setLoading(true);
     try {
-      const payload = { nombre, email, rol };
-      if (password) payload.password = password;
+      const payload = { nombre, documento, telefono, direccion, nacimiento, genero };
 
       let result;
       if (esEdicion) {
-        result = await EditarUsuarios(usuario.id, payload);
+        result = await EditarPacientes(paciente.id, payload);
       } else {
-        result = await crearUsuarios(payload);
+        result = await crearPaciente(payload);
       }
 
       if (result?.success) {
         Alert.alert(
           "Éxito",
-          esEdicion ? "Usuario actualizado correctamente" : "Usuario creado correctamente"
+          esEdicion
+            ? "Paciente actualizado correctamente"
+            : "Paciente creado correctamente"
         );
         navigation.goBack();
       } else {
-        Alert.alert("Error", result?.message || "No se pudo guardar el usuario");
+        Alert.alert("Error", result?.message || "No se pudo guardar el paciente");
       }
     } catch (error) {
-      Alert.alert("Error", "No se pudo guardar el usuario");
+      Alert.alert("Error", "No se pudo guardar el paciente");
     } finally {
       setLoading(false);
     }
@@ -76,7 +61,7 @@ export default function EditarUsuario({ navigation, route }) {
     >
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.title}>
-          {esEdicion ? "Editar Usuario" : "Nuevo Usuario"}
+          {esEdicion ? "Editar Paciente" : "Nuevo Paciente"}
         </Text>
 
         <TextInput
@@ -88,34 +73,47 @@ export default function EditarUsuario({ navigation, route }) {
 
         <TextInput
           style={styles.input}
-          placeholder="Email"
-          keyboardType="email-address"
-          autoCapitalize="none"
-          value={email}
-          onChangeText={setEmail}
+          placeholder="Documento"
+          keyboardType="numeric"
+          value={documento}
+          onChangeText={setDocumento}
         />
 
         <TextInput
           style={styles.input}
-          placeholder="Contraseña (dejar en blanco para no cambiar)"
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
+          placeholder="Teléfono"
+          keyboardType="phone-pad"
+          value={telefono}
+          onChangeText={setTelefono}
         />
 
-        <Text style={styles.label}>Rol:</Text>
-        <View style={styles.rolesContainer}>
-          {["paciente", "doctores", "administrador"].map((item) => (
+        <TextInput
+          style={styles.input}
+          placeholder="Dirección"
+          value={direccion}
+          onChangeText={setDireccion}
+        />
+
+        <TextInput
+          style={styles.input}
+          placeholder="Fecha de nacimiento (YYYY-MM-DD)"
+          value={nacimiento}
+          onChangeText={setNacimiento}
+        />
+
+        <Text style={styles.label}>Género:</Text>
+        <View style={styles.generoContainer}>
+          {["Masculino", "Femenino", "Otro"].map((item) => (
             <TouchableOpacity
               key={item}
-              style={[styles.rolButton, rol === item && styles.rolSelected]}
-              onPress={() => setRol(item)}
+              style={[styles.generoButton, genero === item && styles.generoSelected]}
+              onPress={() => setGenero(item)}
               disabled={loading}
             >
               <Text
-                style={[styles.rolText, rol === item && styles.rolTextSelected]}
+                style={[styles.generoText, genero === item && styles.generoTextSelected]}
               >
-                {item.charAt(0).toUpperCase() + item.slice(1)}
+                {item}
               </Text>
             </TouchableOpacity>
           ))}
@@ -172,12 +170,12 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     fontWeight: "bold",
   },
-  rolesContainer: {
+  generoContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 20,
   },
-  rolButton: {
+  generoButton: {
     flex: 1,
     padding: 10,
     marginHorizontal: 5,
@@ -186,14 +184,14 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: "center",
   },
-  rolSelected: {
+  generoSelected: {
     backgroundColor: "#007bff",
     borderColor: "#007bff",
   },
-  rolText: {
+  generoText: {
     color: "#000",
   },
-  rolTextSelected: {
+  generoTextSelected: {
     color: "#fff",
     fontWeight: "bold",
   },

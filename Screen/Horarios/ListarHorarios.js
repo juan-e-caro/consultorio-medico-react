@@ -1,47 +1,47 @@
 import { View, Text, FlatList, ActivityIndicator, TouchableOpacity, StyleSheet, Alert, Button } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useEffect, useState } from "react";
-import { listarUsuarios, eliminarUsuarios } from "../../Src/Services/UsuariosServive";
-import UsuariosCard from "../../components/UsuariosCard";
+import { listarHorarios, eliminarHorarios } from "../../Src/Services/HorariosService";
+import HorariosCard from "../../components/HorariosCard";
 
-export default function ListarUsuarios() {
-    const [usuarios, setUsuarios] = useState([]);
+export default function ListarHorarios() {
+    const [horarios, setHorarios] = useState([]);
     const [loading, setLoading] = useState(true);
     const navigation = useNavigation();
 
-    const handleUsuarios = async () => {
+    const handleHorarios = async () => {
         setLoading(true);
         try {
-            const result = await listarUsuarios();
+            const result = await listarHorarios();
             if(result.success){
-                setUsuarios(result.data);
+                setHorarios(result.data);
             } else {
-                Alert.alert("Error", result.message || "No se pudieron cargar los usuarios");
+                Alert.alert("Error", result.message || "No se pudieron cargar los horarios");
             }
         } catch (error) {
-            Alert.alert("Error", "No se pudieron cargar los usuarios");
+            Alert.alert("Error", "No se pudieron cargar los horarios");
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        const unsubscribe = navigation.addListener('focus', handleUsuarios);
+        const unsubscribe = navigation.addListener('focus', handleHorarios);
         return () => unsubscribe();
     }, [navigation]);
 
-    const handleEditar = (usuario) => {
-        navigation.navigate("EditarUsuarios", { usuario });
+    const handleEditar = (horarios) => {
+        navigation.navigate("EditarHorarios", { horarios });
     };
 
     const handleCrear = () => {
-        navigation.navigate("EditarUsuarios");
+        navigation.navigate("EditarHorarios");
     };
 
     const handleEliminar = (id) => {
         Alert.alert(
             "Confirmar eliminación",
-            "¿Estás seguro de que deseas eliminar este usuario?",
+            "¿Estás seguro de que deseas eliminar este horario?",
             [
                 { text: "Cancelar", style: "cancel" },
                 { 
@@ -49,14 +49,14 @@ export default function ListarUsuarios() {
                     style: "destructive",
                     onPress: async () => {
                         try {
-                            const result = await eliminarUsuarios(id);
+                            const result = await eliminarHorarios(id);
                             if(result.success){
-                                handleUsuarios();
+                                handleHorarios();
                             } else {
-                                Alert.alert("Error", result.message || "No se pudo eliminar el usuario");
+                                Alert.alert("Error", result.message || "No se pudo eliminar el horario");
                             }
                         } catch (error) {
-                            Alert.alert("Error", "No se pudo eliminar el usuario");
+                            Alert.alert("Error", "No se pudo eliminar el horario");
                         }
                     }
                 }
@@ -75,21 +75,21 @@ export default function ListarUsuarios() {
     return (
         <View style={{ flex: 1 }}>
             <FlatList
-                data={usuarios}
+                data={horarios}
                 keyExtractor={(item) => item.id.toString()}
                 renderItem={({ item }) => (
-                    <UsuariosCard
-                        usuario={item}
+                    <HorariosCard
+                        horarios={item}
                         onEdit={() => handleEditar(item)}
                         onDelete={() => handleEliminar(item.id)}
                     />
                 )}
-                ListEmptyComponent={<Text style={styles.empty}>No hay usuarios registrados</Text>}
+                ListEmptyComponent={<Text style={styles.empty}>No hay horarios registrados</Text>}
             />
 
             <View style={styles.botonesContainer}>
                 <TouchableOpacity style={styles.botonCrear} onPress={handleCrear}>
-                    <Text style={styles.textoBoton}>+ Nuevo Usuario</Text>
+                    <Text style={styles.textoBoton}>Nuevo Horario</Text>
                 </TouchableOpacity>
 
                 <Button

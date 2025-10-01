@@ -26,7 +26,7 @@ export const eliminarHorarios = async (id) => {
     }
 }
 
-export const EditarHorarios = async (id,data) => {
+export const editarHorarios = async (id,data) => {
     try{
         const response = await api.put(`/actualizarHorarios/${id}`, data);
         return { success: true, data: response.data};

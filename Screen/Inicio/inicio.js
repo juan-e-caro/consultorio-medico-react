@@ -34,8 +34,8 @@ export default function Inicio({ navigation }) {
                     onPress={() => navigation.navigate("ListarUsuarios")}
                 />
                 <CardComponent
-                    title="Doctores"
-                    description="Ver lista de doctores"
+                    title="doctores"
+                    description="Ver lista de doctoreses"
                     icon="medkit-outline"
                     onPress={() => navigation.navigate("ListarDoctores")}
                 />
@@ -44,6 +44,12 @@ export default function Inicio({ navigation }) {
                     description="Ver lista de especialidades"
                     icon="list-outline"
                     onPress={() => navigation.navigate("ListarEspecialidades")}
+                />
+                <CardComponent
+                    title="Pacientes"
+                    description="Ver lista de pacientes"
+                    icon="people-outline"
+                    onPress={() => navigation.navigate("ListarPacientes")}
                 />
                 <CardComponent
                     title="Consultorios"

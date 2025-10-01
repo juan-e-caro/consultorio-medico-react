@@ -3,7 +3,7 @@ import { Ionicons } from "@expo/vector-icons";
 
 export default function HistorialCard({ historial, onEdit, onDelete }) {
     const nombrePaciente = historial.paciente?.usuario?.nombre || "Paciente no disponible";
-    const nombreDoctor = historial.cita?.doctor?.usuario?.nombre || "Doctor no disponible";
+    const nombredoctores = historial.cita?.doctores?.usuario?.nombre || "doctores no disponible";
     const fechaCita = formatearFecha(historial.cita?.fecha);
 
     return (
@@ -11,7 +11,7 @@ export default function HistorialCard({ historial, onEdit, onDelete }) {
             <View style={styles.info}>
                 <Text style={styles.nombre}>{nombrePaciente}</Text>
                 <Text style={styles.detalle}>Fecha: {fechaCita}</Text>
-                <Text style={styles.detalle}>Doctor: {nombreDoctor}</Text>
+                <Text style={styles.detalle}>doctores: {nombredoctores}</Text>
                 <Text style={styles.label}>Diagnóstico:</Text>
                 <Text style={styles.valor}>{historial.diagnostico}</Text>
                 <Text style={styles.label}>Tratamiento:</Text>

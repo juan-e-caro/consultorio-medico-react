@@ -29,7 +29,7 @@ export default function MainNavigation() {
         >
             <Tab.Screen 
                 name="Inicio"
-                component={InicioStack} // Esto ahora sí es un componente React válido
+                component={InicioStack} 
                 options={{
                     headerShown: false,
                     tabBarIcon: ({ color, size }) => (

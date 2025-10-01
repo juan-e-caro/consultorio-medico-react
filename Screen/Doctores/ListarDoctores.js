@@ -1,47 +1,47 @@
 import { View, Text, FlatList, ActivityIndicator, TouchableOpacity, StyleSheet, Alert, Button } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useEffect, useState } from "react";
-import { listarUsuarios, eliminarUsuarios } from "../../Src/Services/UsuariosServive";
-import UsuariosCard from "../../components/UsuariosCard";
+import { listardoctores, eliminarDoctores } from "../../Src/Services/DoctoresService";
+import DoctoresCard from "../../components/DoctoresCard";
 
-export default function ListarUsuarios() {
-    const [usuarios, setUsuarios] = useState([]);
+export default function ListarDoctores() {
+    const [doctoreses, setDoctores] = useState([]);
     const [loading, setLoading] = useState(true);
     const navigation = useNavigation();
 
-    const handleUsuarios = async () => {
+    const handleDoctores = async () => {
         setLoading(true);
         try {
-            const result = await listarUsuarios();
+            const result = await listardoctores();
             if(result.success){
-                setUsuarios(result.data);
+                setDoctores(result.data);
             } else {
-                Alert.alert("Error", result.message || "No se pudieron cargar los usuarios");
+                Alert.alert("Error", result.message || "No se pudieron cargar los doctores");
             }
         } catch (error) {
-            Alert.alert("Error", "No se pudieron cargar los usuarios");
+            Alert.alert("Error", "No se pudieron cargar los doctores");
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        const unsubscribe = navigation.addListener('focus', handleUsuarios);
+        const unsubscribe = navigation.addListener('focus', handleDoctores);
         return () => unsubscribe();
     }, [navigation]);
 
-    const handleEditar = (usuario) => {
-        navigation.navigate("EditarUsuarios", { usuario });
+    const handleEditar = (doctores) => {
+        navigation.navigate("EditarDoctores", { doctores });
     };
 
     const handleCrear = () => {
-        navigation.navigate("EditarUsuarios");
+        navigation.navigate("EditarDoctores");
     };
 
     const handleEliminar = (id) => {
         Alert.alert(
             "Confirmar eliminación",
-            "¿Estás seguro de que deseas eliminar este usuario?",
+            "¿Estás seguro de que deseas eliminar este doctor?",
             [
                 { text: "Cancelar", style: "cancel" },
                 { 
@@ -49,14 +49,14 @@ export default function ListarUsuarios() {
                     style: "destructive",
                     onPress: async () => {
                         try {
-                            const result = await eliminarUsuarios(id);
+                            const result = await eliminarDoctores(id);
                             if(result.success){
-                                handleUsuarios();
+                                handleDoctores();
                             } else {
-                                Alert.alert("Error", result.message || "No se pudo eliminar el usuario");
+                                Alert.alert("Error", result.message || "No se pudo eliminar el doctor");
                             }
                         } catch (error) {
-                            Alert.alert("Error", "No se pudo eliminar el usuario");
+                            Alert.alert("Error", "No se pudo eliminar el doctor");
                         }
                     }
                 }
@@ -75,21 +75,21 @@ export default function ListarUsuarios() {
     return (
         <View style={{ flex: 1 }}>
             <FlatList
-                data={usuarios}
+                data={doctoreses}
                 keyExtractor={(item) => item.id.toString()}
                 renderItem={({ item }) => (
-                    <UsuariosCard
-                        usuario={item}
+                    <DoctoresCard
+                        doctores={item}
                         onEdit={() => handleEditar(item)}
                         onDelete={() => handleEliminar(item.id)}
                     />
                 )}
-                ListEmptyComponent={<Text style={styles.empty}>No hay usuarios registrados</Text>}
+                ListEmptyComponent={<Text style={styles.empty}>No hay doctores registrados</Text>}
             />
 
             <View style={styles.botonesContainer}>
                 <TouchableOpacity style={styles.botonCrear} onPress={handleCrear}>
-                    <Text style={styles.textoBoton}>+ Nuevo Usuario</Text>
+                    <Text style={styles.textoBoton}>Nuevo doctor</Text>
                 </TouchableOpacity>
 
                 <Button

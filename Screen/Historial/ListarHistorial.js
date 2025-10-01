@@ -1,47 +1,47 @@
 import { View, Text, FlatList, ActivityIndicator, TouchableOpacity, StyleSheet, Alert, Button } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useEffect, useState } from "react";
-import { listarUsuarios, eliminarUsuarios } from "../../Src/Services/UsuariosServive";
-import UsuariosCard from "../../components/UsuariosCard";
+import { listarHistorial, eliminarHistorial } from "../../Src/Services/HistorialService";
+import HistorialCard from "../../components/HistorialCard";
 
-export default function ListarUsuarios() {
-    const [usuarios, setUsuarios] = useState([]);
+export default function ListarHistorial() {
+    const [historial, setHistorial] = useState([]);
     const [loading, setLoading] = useState(true);
     const navigation = useNavigation();
 
-    const handleUsuarios = async () => {
+    const handleHistorial = async () => {
         setLoading(true);
         try {
-            const result = await listarUsuarios();
+            const result = await listarHistorial();
             if(result.success){
-                setUsuarios(result.data);
+                setHistorial(result.data);
             } else {
-                Alert.alert("Error", result.message || "No se pudieron cargar los usuarios");
+                Alert.alert("Error", result.message || "No se pudo cargar el historial");
             }
         } catch (error) {
-            Alert.alert("Error", "No se pudieron cargar los usuarios");
+            Alert.alert("Error", "No se pudo cargar el historial");
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        const unsubscribe = navigation.addListener('focus', handleUsuarios);
+        const unsubscribe = navigation.addListener('focus', handleHistorial);
         return () => unsubscribe();
     }, [navigation]);
 
-    const handleEditar = (usuario) => {
-        navigation.navigate("EditarUsuarios", { usuario });
+    const handleEditar = (historial) => {
+        navigation.navigate("EditarHistorial", { historial });
     };
 
     const handleCrear = () => {
-        navigation.navigate("EditarUsuarios");
+        navigation.navigate("EditarHistorial");
     };
 
     const handleEliminar = (id) => {
         Alert.alert(
             "Confirmar eliminación",
-            "¿Estás seguro de que deseas eliminar este usuario?",
+            "¿Estás seguro de que deseas eliminar este historial?",
             [
                 { text: "Cancelar", style: "cancel" },
                 { 
@@ -49,14 +49,14 @@ export default function ListarUsuarios() {
                     style: "destructive",
                     onPress: async () => {
                         try {
-                            const result = await eliminarUsuarios(id);
+                            const result = await eliminarHistorial(id);
                             if(result.success){
-                                handleUsuarios();
+                                handleHistorial();
                             } else {
-                                Alert.alert("Error", result.message || "No se pudo eliminar el usuario");
+                                Alert.alert("Error", result.message || "No se pudo eliminar el historial");
                             }
                         } catch (error) {
-                            Alert.alert("Error", "No se pudo eliminar el usuario");
+                            Alert.alert("Error", "No se pudo eliminar el historial");
                         }
                     }
                 }
@@ -75,21 +75,21 @@ export default function ListarUsuarios() {
     return (
         <View style={{ flex: 1 }}>
             <FlatList
-                data={usuarios}
+                data={historial}
                 keyExtractor={(item) => item.id.toString()}
                 renderItem={({ item }) => (
-                    <UsuariosCard
-                        usuario={item}
+                    <HistorialCard
+                        historial={item}
                         onEdit={() => handleEditar(item)}
                         onDelete={() => handleEliminar(item.id)}
                     />
                 )}
-                ListEmptyComponent={<Text style={styles.empty}>No hay usuarios registrados</Text>}
+                ListEmptyComponent={<Text style={styles.empty}>No hay historiales registrados</Text>}
             />
 
             <View style={styles.botonesContainer}>
                 <TouchableOpacity style={styles.botonCrear} onPress={handleCrear}>
-                    <Text style={styles.textoBoton}>+ Nuevo Usuario</Text>
+                    <Text style={styles.textoBoton}>Nuevo Historial</Text>
                 </TouchableOpacity>
 
                 <Button

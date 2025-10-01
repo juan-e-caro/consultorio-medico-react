@@ -2,7 +2,6 @@ import { View, Text, TextInput, StyleSheet, Alert, ActivityIndicator } from "rea
 import BottonComponent from "../../components/BottonComponent";
 import { useState } from "react";
 import { loginUser } from "../../Src/Services/AuthService";
-import AsyncStorage from "@react-native-async-storage/async-storage"; // import para token dev
 
 export default function LoginScreen({ navigation }) {
     const [email, setEmail] = useState("");
@@ -31,6 +30,12 @@ export default function LoginScreen({ navigation }) {
 
     return (
         <View style={styles.container}>
+            {/* --- Nombre y descripción de la app --- */}
+            <Text style={styles.appName}>MediSys</Text>
+            <Text style={styles.subtitle}>
+                Sistema de gestión de citas, pacientes y doctoreses
+            </Text>
+
             <Text style={styles.title}>Iniciar Sesión</Text>
 
             <TextInput
@@ -67,6 +72,7 @@ export default function LoginScreen({ navigation }) {
                 onPress={() => navigation.navigate("registro")}
                 style={{ backgroundColor: "#4CAF50", marginTop: 16 }}
             />
+
         </View>
     );
 }
@@ -77,6 +83,19 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         padding: 16,
         backgroundColor: "#E3F2FD",
+    },
+    appName: {
+        fontSize: 32,
+        fontWeight: "bold",
+        color: "#0D47A1",
+        textAlign: "center",
+        marginBottom: 4,
+    },
+    subtitle: {
+        fontSize: 16,
+        color: "#1565C0",
+        textAlign: "center",
+        marginBottom: 24,
     },
     title: {
         fontSize: 26,

@@ -6,7 +6,7 @@ export default function HorariosCard({ horario, onEdit, onDelete }) {
         <View style={styles.card}>
             <View style={styles.info}>
                 <Text style={styles.nombre}>
-                    {horario.doctor?.usuario?.nombre || "Doctor no disponible"}
+                    {horario.doctores?.usuario?.nombre || "doctores no disponible"}
                 </Text>
                 <Text style={styles.detalle}>Día: {horario.diaSemana}</Text>
                 <Text style={styles.detalle}>Horario: {horario.horaInicio} - {horario.horaFin}</Text>
