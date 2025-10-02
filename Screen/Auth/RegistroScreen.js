@@ -1,13 +1,15 @@
 import { View, Text, TextInput, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import BottonComponent from '../../components/BottonComponent';
 import React, { useState } from 'react';
-import { registerUser } from '../../Src/Services/AuthService'; // Ajusta la ruta
+import { registerUser } from '../../Src/Services/AuthService';
+import { Picker } from '@react-native-picker/picker'; // <-- Importa Picker
 
 export default function RegistroScreen({ navigation }) {
     const [nombre, setNombre] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmarPassword, setConfirmarPassword] = useState("");
+    const [rol, setRol] = useState("usuario");  // Estado para el rol, default "usuario"
     const [loading, setLoading] = useState(false);
 
     const handleRegister = async () => {
@@ -23,13 +25,14 @@ export default function RegistroScreen({ navigation }) {
 
         setLoading(true);
 
-        const result = await registerUser(nombre, email, password, confirmarPassword);
+        // Envía el rol también
+        const result = await registerUser(nombre, email, password, confirmarPassword, rol);
 
         setLoading(false);
 
         if(result.success){
             Alert.alert("Registro exitoso", "Usuario registrado correctamente.");
-            navigation.replace("login"); // o navega a login
+            navigation.replace("Inicio");
         } else {
             Alert.alert("Error al registrar", result.message?.message || result.message);
         }
@@ -72,6 +75,20 @@ export default function RegistroScreen({ navigation }) {
                 editable={!loading}
             />
 
+            {/* Picker para seleccionar rol */}
+            <View style={styles.pickerContainer}>
+                <Text style={styles.label}>Selecciona tu rol:</Text>
+                <Picker
+                    selectedValue={rol}
+                    onValueChange={(itemValue) => setRol(itemValue)}
+                    enabled={!loading}
+                    style={styles.picker}
+                >
+                    <Picker.Item label="Usuario" value="usuario" />
+                    <Picker.Item label="Doctor" value="doctor" />
+                </Picker>
+            </View>
+
             <BottonComponent
                 title={loading ? "" : "Registrarse"}
                 onPress={handleRegister}
@@ -82,37 +99,52 @@ export default function RegistroScreen({ navigation }) {
 
             <BottonComponent
                 title="Iniciar sesión"
-                onPress={() => navigation.navigate("login")}
+                onPress={() => navigation.navigate("Login")}
                 style={{ backgroundColor: "#4CAF50", marginTop: 16 }}
             />
         </View>
     )
 }
 
-
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: "center",
         padding: 16,
-        backgroundColor: "#E3F2FD", // Azul muy claro
+        backgroundColor: "#E3F2FD",
     },
     title: {
         fontSize: 26,
         fontWeight: "bold",
         marginBottom: 24,
         textAlign: "center",
-        color: "#0D47A1", // Azul oscuro
+        color: "#0D47A1",
     },
     input: {
         height: 50,
-        borderColor: "#90CAF9", // Azul suave
+        borderColor: "#90CAF9",
         borderWidth: 1.5,
         borderRadius: 8,
         paddingHorizontal: 16,
         marginBottom: 16,
         backgroundColor: "#FFFFFF",
+        color: "#0D47A1",
+    },
+    pickerContainer: {
+        borderColor: "#90CAF9",
+        borderWidth: 1.5,
+        borderRadius: 8,
+        marginBottom: 16,
+        backgroundColor: "#FFFFFF",
+    },
+    label: {
+        fontSize: 16,
+        color: "#0D47A1",
+        marginLeft: 12,
+        marginTop: 8,
+    },
+    picker: {
+        height: 50,
         color: "#0D47A1",
     },
 });

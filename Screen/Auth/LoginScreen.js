@@ -2,6 +2,7 @@ import { View, Text, TextInput, StyleSheet, Alert, ActivityIndicator } from "rea
 import BottonComponent from "../../components/BottonComponent";
 import { useState } from "react";
 import { loginUser } from "../../Src/Services/AuthService";
+import AsyncStorage from "@react-native-async-storage/async-storage"; // import para token dev
 
 export default function LoginScreen({ navigation }) {
     const [email, setEmail] = useState("");
@@ -22,7 +23,7 @@ export default function LoginScreen({ navigation }) {
 
         if(result.success){
             // Login correcto → navegar a inicio
-            navigation.replace("inicio"); // replace evita volver al login
+            navigation.replace("Inicio"); // replace evita volver al login
         } else {
             Alert.alert("Error de autenticación", result.message?.message || result.message);
         }
@@ -72,7 +73,6 @@ export default function LoginScreen({ navigation }) {
                 onPress={() => navigation.navigate("registro")}
                 style={{ backgroundColor: "#4CAF50", marginTop: 16 }}
             />
-
         </View>
     );
 }

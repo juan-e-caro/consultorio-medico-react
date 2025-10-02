@@ -84,7 +84,7 @@ export default function ListarHistorial() {
                         onDelete={() => handleEliminar(item.id)}
                     />
                 )}
-                ListEmptyComponent={<Text style={styles.empty}>No hay historiales registrados</Text>}
+                ListEmptyComponent={<Text style={styles.empty}>No hay historial registrado</Text>}
             />
 
             <View style={styles.botonesContainer}>

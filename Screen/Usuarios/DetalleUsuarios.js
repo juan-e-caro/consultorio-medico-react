@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Alert } from "react-native";
 import { useState, useEffect } from "react";
 import { useRoute, useNavigation } from "@react-navigation/native";
-import { obtenerUsuario } from "../../Src/Services/UsuariosServive"; // función que obtiene usuario por id
+import { obtenerUsuario } from "../../Src/Services/UsuariosService";
 
 export default function DetalleUsuarios() {
   const route = useRoute();

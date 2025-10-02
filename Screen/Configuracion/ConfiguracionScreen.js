@@ -14,7 +14,7 @@ export default function ConfiguracionScreen() {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Privacidad</Text>
         <View style={styles.row}>
-          <Text>Compartir datos con doctoreses</Text>
+          <Text>Compartir datos con doctores</Text>
           <Switch value={compartirDatos} onValueChange={setCompartirDatos} />
         </View>
       </View>

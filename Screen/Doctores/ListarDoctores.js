@@ -5,25 +5,29 @@ import { listardoctores, eliminarDoctores } from "../../Src/Services/DoctoresSer
 import DoctoresCard from "../../components/DoctoresCard";
 
 export default function ListarDoctores() {
-    const [doctoreses, setDoctores] = useState([]);
+    const [doctores, setDoctores] = useState([]);
     const [loading, setLoading] = useState(true);
     const navigation = useNavigation();
 
     const handleDoctores = async () => {
-        setLoading(true);
-        try {
-            const result = await listardoctores();
-            if(result.success){
-                setDoctores(result.data);
-            } else {
-                Alert.alert("Error", result.message || "No se pudieron cargar los doctores");
-            }
-        } catch (error) {
-            Alert.alert("Error", "No se pudieron cargar los doctores");
-        } finally {
-            setLoading(false);
+    setLoading(true);
+    try {
+        const result = await listardoctores();
+        console.log("RESULTADO DE DOCTORES:", JSON.stringify(result.data, null, 2));
+        
+        if (result.success) {
+        setDoctores(result.data);
+        } else {
+        Alert.alert("Error", result.message || "No se pudieron cargar los doctores");
         }
+    } catch (error) {
+        console.error("Error al cargar doctores:", error);
+        Alert.alert("Error", "No se pudieron cargar los doctores");
+    } finally {
+        setLoading(false);
+    }
     };
+
 
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', handleDoctores);
@@ -75,7 +79,7 @@ export default function ListarDoctores() {
     return (
         <View style={{ flex: 1 }}>
             <FlatList
-                data={doctoreses}
+                data={doctores}
                 keyExtractor={(item) => item.id.toString()}
                 renderItem={({ item }) => (
                     <DoctoresCard

@@ -1,27 +1,75 @@
-import { useState } from "react";
-import {View,Text,TextInput,StyleSheet,TouchableOpacity,Alert,ActivityIndicator,ScrollView,KeyboardAvoidingView,Platform,} from "react-native";
-import { creardoctores, editardoctores } from "../../Src/Services/DoctoresService";
+import { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native";
+import { Picker } from "@react-native-picker/picker";
+
+// Importa tus servicios
+import {
+  creardoctores,
+  editardoctores,
+  obtenerUsuarios,
+  obtenerEspecialidades,
+} from "../../Src/Services/DoctoresService"; // Ajusta rutas si es necesario
 
 export default function Editardoctores({ navigation, route }) {
   const doctores = route.params?.doctores;
 
-  const [nombre, setNombre] = useState(doctores ? doctores.nombre : "");
-  const [especialidad, setEspecialidad] = useState(doctores ? doctores.especialidad : "");
+  const [usuarios, setUsuarios] = useState([]);
+  const [especialidades, setEspecialidades] = useState([]);
+
+  const [idUsuario, setIdUsuario] = useState(doctores ? doctores.idUsuario : "");
+  const [idEspecialidad, setIdEspecialidad] = useState(
+    doctores ? doctores.idEspecialidad : ""
+  );
   const [cedula, setCedula] = useState(doctores ? doctores.cedula : "");
   const [telefono, setTelefono] = useState(doctores ? doctores.telefono : "");
+
   const [loading, setLoading] = useState(false);
+  const [loadingDatos, setLoadingDatos] = useState(true);
 
   const esEdicion = !!doctores;
 
+  useEffect(() => {
+    const cargarDatos = async () => {
+      setLoadingDatos(true);
+      try {
+        const usuariosRes = await obtenerUsuarios();
+        const especialidadesRes = await obtenerEspecialidades();
+
+        setUsuarios(usuariosRes || []);
+        setEspecialidades(especialidadesRes || []);
+      } catch (error) {
+        Alert.alert(
+          "Error",
+          "No se pudieron cargar los datos necesarios para el formulario."
+        );
+      } finally {
+        setLoadingDatos(false);
+      }
+    };
+
+    cargarDatos();
+  }, []);
+
   const handleGuardar = async () => {
-    if (!nombre || !especialidad || !cedula || !telefono) {
+    if (!idUsuario || !idEspecialidad || !cedula || !telefono) {
       Alert.alert("Campos requeridos", "Por favor completa todos los campos");
       return;
     }
 
     setLoading(true);
     try {
-      const payload = { nombre, especialidad, cedula, telefono };
+      const payload = { idUsuario, idEspecialidad, cedula, telefono };
 
       let result;
       if (esEdicion) {
@@ -34,15 +82,15 @@ export default function Editardoctores({ navigation, route }) {
         Alert.alert(
           "Éxito",
           esEdicion
-            ? "doctores actualizado correctamente"
-            : "doctores creado correctamente"
+            ? "Doctor actualizado correctamente"
+            : "Doctor creado correctamente"
         );
         navigation.goBack();
       } else {
-        Alert.alert("Error", result?.message || "No se pudo guardar el doctores");
+        Alert.alert("Error", result?.message || "No se pudo guardar el doctor");
       }
     } catch (error) {
-      Alert.alert("Error", "No se pudo guardar el doctores");
+      Alert.alert("Error", "No se pudo guardar el doctor");
     } finally {
       setLoading(false);
     }
@@ -52,6 +100,17 @@ export default function Editardoctores({ navigation, route }) {
     navigation.goBack();
   };
 
+  if (loadingDatos) {
+    return (
+      <View style={[styles.container, { justifyContent: "center", flex: 1 }]}>
+        <ActivityIndicator size="large" color="#0000ff" />
+        <Text style={{ textAlign: "center", marginTop: 10 }}>
+          Cargando datos...
+        </Text>
+      </View>
+    );
+  }
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -59,22 +118,32 @@ export default function Editardoctores({ navigation, route }) {
     >
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.title}>
-          {esEdicion ? "Editar doctores" : "Nuevo doctores"}
+          {esEdicion ? "Editar Doctor" : "Nuevo Doctor"}
         </Text>
 
-        <TextInput
+        <Text>Selecciona el usuario</Text>
+        <Picker
+          selectedValue={idUsuario}
+          onValueChange={(itemValue) => setIdUsuario(itemValue)}
           style={styles.input}
-          placeholder="Nombre"
-          value={nombre}
-          onChangeText={setNombre}
-        />
+        >
+          <Picker.Item label="Selecciona un usuario" value="" />
+          {usuarios.map((user) => (
+            <Picker.Item key={user.id} label={user.nombre} value={user.id} />
+          ))}
+        </Picker>
 
-        <TextInput
+        <Text>Selecciona la especialidad</Text>
+        <Picker
+          selectedValue={idEspecialidad}
+          onValueChange={(itemValue) => setIdEspecialidad(itemValue)}
           style={styles.input}
-          placeholder="Especialidad"
-          value={especialidad}
-          onChangeText={setEspecialidad}
-        />
+        >
+          <Picker.Item label="Selecciona una especialidad" value="" />
+          {especialidades.map((esp) => (
+            <Picker.Item key={esp.id} label={esp.nombre} value={esp.id} />
+          ))}
+        </Picker>
 
         <TextInput
           style={styles.input}
@@ -93,7 +162,11 @@ export default function Editardoctores({ navigation, route }) {
         />
 
         {loading ? (
-          <ActivityIndicator size="large" color="#0000ff" style={{ marginTop: 20 }} />
+          <ActivityIndicator
+            size="large"
+            color="#0000ff"
+            style={{ marginTop: 20 }}
+          />
         ) : (
           <>
             <TouchableOpacity

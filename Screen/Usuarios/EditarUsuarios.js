@@ -1,17 +1,6 @@
 import { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  StyleSheet,
-  TouchableOpacity,
-  Alert,
-  ActivityIndicator,
-  ScrollView,
-  KeyboardAvoidingView,
-  Platform,
-} from "react-native";
-import { crearUsuarios, EditarUsuarios } from "../../Src/Services/UsuariosServive";
+import {View,Text,TextInput,StyleSheet,TouchableOpacity,Alert,ActivityIndicator,ScrollView,KeyboardAvoidingView,Platform,} from "react-native";
+import { crearUsuarios, EditarUsuarios } from "../../Src/Services/UsuariosService";
 
 export default function EditarUsuario({ navigation, route }) {
   const usuario = route.params?.usuario;

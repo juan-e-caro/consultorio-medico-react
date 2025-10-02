@@ -1,8 +1,8 @@
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-// Cambia esta URL por la de tu backend Laravel
-const API_BASE_URL = "http://10.2.234.43:8000/api"; 
+// Your Laravel API base URL
+const API_BASE_URL = "http://10.2.233.195:8000/api";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -12,20 +12,21 @@ const api = axios.create({
   },
 });
 
-// Rutas que no requieren token
+// Public routes that don't require Authorization header
 const RutasPublicas = ['/login', '/registrar'];
 
 api.interceptors.request.use(
   async (config) => {
+    // Check if current request URL matches any public route
     const esRutaPublica = RutasPublicas.some(ruta => config.url.includes(ruta));
 
-    let userToken = null;
     if (!esRutaPublica) {
-      userToken = await AsyncStorage.getItem("userToken");
-    }
-
-    if (userToken) {
-      config.headers.Authorization = `Bearer ${userToken}`;
+      // Get token from AsyncStorage
+      const userToken = await AsyncStorage.getItem("userToken");
+      if (userToken) {
+        // Add Bearer token to headers
+        config.headers.Authorization = `Bearer ${userToken}`;
+      }
     }
 
     return config;
@@ -41,8 +42,11 @@ api.interceptors.response.use(
 
     if (error.response && error.response.status === 401 && !originalRequest._retry && !esRutaPublica) {
       originalRequest._retry = true;
+
+      // Clear token on unauthorized
       await AsyncStorage.removeItem("userToken");
       console.log("Token expirado o no autorizado. Redirigiendo al login...");
+      // Optionally, trigger a logout or navigation to login here
     }
 
     return Promise.reject(error);

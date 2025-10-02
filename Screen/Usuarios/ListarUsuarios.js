@@ -1,7 +1,7 @@
 import { View, Text, FlatList, ActivityIndicator, TouchableOpacity, StyleSheet, Alert, Button } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useEffect, useState } from "react";
-import { listarUsuarios, eliminarUsuarios } from "../../Src/Services/UsuariosServive";
+import { listarUsuarios, eliminarUsuarios } from "../../Src/Services/UsuariosService";
 import UsuariosCard from "../../components/UsuariosCard";
 
 export default function ListarUsuarios() {
@@ -79,7 +79,7 @@ export default function ListarUsuarios() {
                 keyExtractor={(item) => item.id.toString()}
                 renderItem={({ item }) => (
                     <UsuariosCard
-                        usuario={item}
+                        usuarios={item}
                         onEdit={() => handleEditar(item)}
                         onDelete={() => handleEliminar(item.id)}
                     />

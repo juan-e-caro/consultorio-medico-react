@@ -1,7 +1,7 @@
-import { View, Text, StyleSheet, ActivityIndicator, Alert } from "react-native";
+import { View, Text, StyleSheet, ActivityIndicator, Alert, Image } from "react-native";
 import { useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import BottonComponent from "../../components/BottonComponent";
+import BottonComponent from "../../components/BottonComponent"; // Revisa que este botón esté bien diseñado
 import api from "../../Src/Services/Conexion";
 
 export default function PerfilScreen() {
@@ -21,15 +21,11 @@ export default function PerfilScreen() {
                 setUsuario(response.data);
             } catch (error) {
                 console.error("Error al cargar el perfil:", error);
-                if (error.isAuthError || error.shouldRedirectToLogin) {
-                    console.log("Error de autenticación. Redirigiendo al login.");
-                    return;
-                }
 
                 if (error.response) {
                     Alert.alert(
                         "Error del servidor",
-                        `Error ${error.response.status}: ${error.response.data?.message || "Ocurrió un error al cargar el perfil"}`,
+                        `Error ${error.response.status}: ${error.response.data?.message || "Error al cargar el perfil"}`,
                         [
                             {
                                 text: "OK",
@@ -55,7 +51,7 @@ export default function PerfilScreen() {
                 } else {
                     Alert.alert(
                         "Error",
-                        "Ocurrió un error inesperado al cargar el perfil.",
+                        "Ocurrió un error inesperado.",
                         [
                             {
                                 text: "OK",
@@ -77,7 +73,7 @@ export default function PerfilScreen() {
     if (cargando) {
         return (
             <View style={styles.container}>
-                <ActivityIndicator size="large" color="#0000ff" />
+                <ActivityIndicator size="large" color="#0d6efd" />
                 <Text style={styles.loadingText}>Cargando perfil...</Text>
             </View>
         );
@@ -87,19 +83,45 @@ export default function PerfilScreen() {
         return (
             <View style={styles.container}>
                 <Text style={styles.title}>Perfil de Usuario</Text>
-                <View style={styles.containerPerfil}>
+                <View style={styles.card}>
                     <Text style={styles.errorText}>No se pudo cargar el perfil.</Text>
                 </View>
             </View>
         );
     }
 
+    const { name, email } = usuario.user;
+
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Perfil de Usuario</Text>
-            <View style={styles.containerPerfil}>
-                <Text style={styles.label}>Nombre: {usuario.user.name || "No disponible"}</Text>
-                <Text style={styles.label}>Correo: {usuario.user.email || "No disponible"}</Text>
+
+            <View style={styles.card}>
+                {/* Avatar de ejemplo */}
+                <Image
+                    style={styles.avatar}
+                    source={{
+                        uri: "https://ui-avatars.com/api/?name=" + encodeURIComponent(name || "User"),
+                    }}
+                />
+
+                {/* Info del perfil */}
+                <Text style={styles.label}><Text style={styles.labelTitle}>Nombre:</Text> {name || "No disponible"}</Text>
+                <Text style={styles.label}><Text style={styles.labelTitle}>Correo:</Text> {email || "No disponible"}</Text>
+
+                {/* Separador */}
+                <View style={styles.divider} />
+
+                {/* Botón personalizado */}
+                <BottonComponent
+                    title="Cerrar sesión"
+                    onPress={async () => {
+                        await AsyncStorage.removeItem("userToken");
+                        Alert.alert("Sesión cerrada", "Has cerrado sesión correctamente.");
+                        // Puedes redirigir al login si lo necesitas aquí
+                    }}
+                    color="#dc3545"
+                />
             </View>
         </View>
     );
@@ -109,35 +131,58 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 20,
-        backgroundColor: '#fff',
+        backgroundColor: '#f8f9fa',
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
     },
     title: {
-        fontSize: 24,
+        fontSize: 26,
         fontWeight: 'bold',
-        marginVertical: 20,
+        marginBottom: 20,
+        color: '#212529',
         textAlign: 'center',
     },
-    containerPerfil: {
-        padding: 20,
-        borderRadius: 10,
-        backgroundColor: "#f0f0f0",
-        marginBottom: 20,
+    card: {
         width: '100%',
+        backgroundColor: '#ffffff',
+        borderRadius: 10,
+        padding: 20,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 5,
+        elevation: 3,
+        alignItems: 'center',
+    },
+    avatar: {
+        width: 100,
+        height: 100,
+        borderRadius: 50,
+        marginBottom: 20,
     },
     label: {
         fontSize: 18,
         marginBottom: 10,
+        color: '#343a40',
+    },
+    labelTitle: {
+        fontWeight: 'bold',
+        color: '#495057',
+    },
+    divider: {
+        height: 1,
+        backgroundColor: '#dee2e6',
+        width: '100%',
+        marginVertical: 20,
     },
     loadingText: {
         marginTop: 10,
         fontSize: 16,
-        color: '#555',
+        color: '#6c757d',
     },
     errorText: {
-        color: 'red',
+        color: '#dc3545',
         fontSize: 16,
         textAlign: 'center',
-    }
+    },
 });

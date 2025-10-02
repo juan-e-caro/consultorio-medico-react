@@ -7,7 +7,6 @@ export default function Inicio({ navigation }) {
         try {
             await AsyncStorage.removeItem("userToken");
             Alert.alert("Sesión cerrada", "Has cerrado sesión correctamente.");
-            navigation.replace("login");
         } catch (error) {
             console.error("Error cerrando sesión:", error);
             Alert.alert("Error", "No se pudo cerrar sesión.");
