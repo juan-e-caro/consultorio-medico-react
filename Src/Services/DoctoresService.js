@@ -1,11 +1,11 @@
 import api from "./Conexion";
 
-export const listardoctoreses = async () => {
+export const listarDoctores = async () => {
     try{
-        const response = await api.get("/listardoctoreses");
+        const response = await api.get("/listarDoctores");
         return { success: true, data: response.data};
     } catch (error) {
-        console.error("error al listar doctoreses:", error.response ? error.response.data : error.message);
+        console.error("error al listar doctores:", error.response ? error.response.data : error.message);
         return {
             success: false,
             message: error.response ? error.response.data : "error de conexión",
@@ -13,12 +13,12 @@ export const listardoctoreses = async () => {
     }
 }
 
-export const eliminardoctoreses = async (id) => {
+export const eliminarDoctores = async (id) => {
     try {
-        await api.delete(`/eliminardoctoreses${id}`);
+        await api.delete(`/eliminarDoctores${id}`);
         return { success: true};
     } catch (error) {
-        console.error("Error al eliminar doctoreses", error.response ? error.response.data : error.message);
+        console.error("Error al eliminar doctores", error.response ? error.response.data : error.message);
         return {
             success: false,
             message: error.response ? error.response.data : "error de conexión",
@@ -26,12 +26,12 @@ export const eliminardoctoreses = async (id) => {
     }
 }
 
-export const editardoctoreses = async (id,data) => {
+export const editarDoctores = async (id,data) => {
     try{
-        const response = await api.put(`/actualizardoctoreses/${id}`, data);
+        const response = await api.put(`/actualizarDoctores/${id}`, data);
         return { success: true, data: response.data};
     } catch (error) {
-        console.error("error al editar doctoreses:", error.response ? error.response.data : error.message);
+        console.error("error al editar doctores:", error.response ? error.response.data : error.message);
         return{
             success: false,
             message: error.response ? error.response.data : "error de conexión",

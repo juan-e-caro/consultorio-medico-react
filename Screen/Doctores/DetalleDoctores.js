@@ -3,10 +3,10 @@ import { useState, useEffect } from "react";
 import { useRoute, useNavigation } from "@react-navigation/native";
 import { obtenerDoctores } from "../../Src/Services/DoctoresService";
 
-export default function Detalledoctoreses() {
+export default function Detalledoctores() {
   const route = useRoute();
   const navigation = useNavigation();
-  const { doctoresId } = route.params;
+  const { idDoctores } = route.params;
 
   const [doctores, setDoctores] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -14,10 +14,10 @@ export default function Detalledoctoreses() {
   useEffect(() => {
     const cargar = async () => {
       try {
-        const result = await obtenerDoctores(doctoresId);
+        const result = await obtenerDoctores(idDoctores);
         if (result.success) setDoctores(result.data);
         else {
-          Alert.alert("Error", result.message || "No se pudo cargar el doctores");
+          Alert.alert("Error", result.message || "No se pudo cargar el doctor");
           navigation.goBack();
         }
       } catch {
@@ -28,10 +28,10 @@ export default function Detalledoctoreses() {
       }
     };
     cargar();
-  }, [doctoresId]);
+  }, [idDoctores]);
 
   if (loading) return <Loading texto="Cargando doctores..." />;
-  if (!doctores) return <Empty texto="No se encontró el doctores." />;
+  if (!doctores) return <Empty texto="No se encontró el doctor." />;
 
   return (
     <ScrollView style={styles.container}>

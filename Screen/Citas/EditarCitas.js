@@ -3,14 +3,12 @@ import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator, Scr
 import { Picker } from "@react-native-picker/picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { crearCitas, EditarCitas } from "../../Src/Services/CitasService";
-import { obtenerPacientes } from "../../Src/Services/PacientesService";
-import { obtenerdoctores } from "../../Src/Services/DoctoresService";
 
 export default function EditarCita({ navigation, route }) {
   const cita = route.params?.cita;
 
   const [pacienteId, setPacienteId] = useState(cita ? cita.pacienteId : "");
-  const [doctoresId, setdoctoresId] = useState(cita ? cita.doctoresId : "");
+  const [idDoctores, setidDoctores] = useState(cita ? cita.idDoctores : "");
   const [fecha, setFecha] = useState(cita ? new Date(cita.fecha) : new Date());
   const [horaInicio, setHoraInicio] = useState(cita ? new Date(cita.horaInicio) : new Date());
   const [horaFin, setHoraFin] = useState(cita ? new Date(cita.horaFin) : new Date());
@@ -26,22 +24,8 @@ export default function EditarCita({ navigation, route }) {
 
   const esEdicion = !!cita;
 
-  useEffect(() => {
-    const cargarDatos = async () => {
-      try {
-        const listaPacientes = await obtenerPacientes();
-        const listadoctores = await obtenerdoctores();
-        setPacientes(listaPacientes || []);
-        setdoctores(listadoctores || []);
-      } catch (error) {
-        console.log("Error al cargar listas", error);
-      }
-    };
-    cargarDatos();
-  }, []);
-
   const handleGuardar = async () => {
-    if (!pacienteId || !doctoresId || !fecha || !horaInicio || !horaFin || !estado) {
+    if (!pacienteId || !idDoctores || !fecha || !horaInicio || !horaFin || !estado) {
       Alert.alert("Campos requeridos", "Por favor completa todos los campos");
       return;
     }
@@ -50,7 +34,7 @@ export default function EditarCita({ navigation, route }) {
     try {
       const payload = {
         pacienteId,
-        doctoresId,
+        idDoctores,
         fecha: fecha.toISOString().split("T")[0], // YYYY-MM-DD
         horaInicio: horaInicio.toTimeString().split(" ")[0].slice(0,5), // HH:MM
         horaFin: horaFin.toTimeString().split(" ")[0].slice(0,5), // HH:MM
@@ -100,8 +84,8 @@ export default function EditarCita({ navigation, route }) {
 
         <Text style={styles.label}>doctores:</Text>
         <Picker
-          selectedValue={doctoresId}
-          onValueChange={(value) => setdoctoresId(value)}
+          selectedValue={idDoctores}
+          onValueChange={(value) => setidDoctores(value)}
           style={styles.input}
         >
           <Picker.Item label="Seleccione un doctores" value="" />

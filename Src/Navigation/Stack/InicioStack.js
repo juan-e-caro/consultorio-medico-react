@@ -12,7 +12,7 @@ import ListarEspecialidades from "../../../Screen/Especialidades/ListarEspeciali
 import DetalleEspecialidades from "../../../Screen/Especialidades/DetalleEspecialidades";
 import EditarEspecialidades from "../../../Screen/Especialidades/EditarEspecialidades";
 
-// doctoreses
+// doctores
 import ListarDoctores from "../../../Screen/Doctores/ListarDoctores";
 import DetalleDoctores from "../../../Screen/Doctores/DetalleDoctores";
 import EditarDoctores from "../../../Screen/Doctores/EditarDoctores";
@@ -48,7 +48,7 @@ export default function InicioStack() {
     return (
         <Stack.Navigator screenOptions={{ headerShown: false }}>
             {/* Pantalla principal */}
-            <Stack.Screen name="Inicio" component={Inicio} />
+            <Stack.Screen name="InicioHome" component={Inicio} />
 
             {/* Usuarios */}
             <Stack.Screen name="ListarUsuarios" component={ListarUsuarios} />
@@ -60,7 +60,7 @@ export default function InicioStack() {
             <Stack.Screen name="DetalleEspecialidades" component={DetalleEspecialidades} />
             <Stack.Screen name="EditarEspecialidades" component={EditarEspecialidades} />
 
-            {/* doctoreses */}
+            {/* doctores */}
             <Stack.Screen name="ListarDoctores" component={ListarDoctores} />
             <Stack.Screen name="DetalleDoctores" component={DetalleDoctores} />
             <Stack.Screen name="EditarDoctores" component={EditarDoctores} />

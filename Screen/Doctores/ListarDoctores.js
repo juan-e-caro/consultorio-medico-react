@@ -1,7 +1,7 @@
 import { View, Text, FlatList, ActivityIndicator, TouchableOpacity, StyleSheet, Alert, Button } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useEffect, useState } from "react";
-import { listardoctores, eliminarDoctores } from "../../Src/Services/DoctoresService";
+import { listarDoctores, eliminarDoctores } from "../../Src/Services/DoctoresService";
 import DoctoresCard from "../../components/DoctoresCard";
 
 export default function ListarDoctores() {
@@ -12,13 +12,11 @@ export default function ListarDoctores() {
     const handleDoctores = async () => {
     setLoading(true);
     try {
-        const result = await listardoctores();
-        console.log("RESULTADO DE DOCTORES:", JSON.stringify(result.data, null, 2));
-        
+        const result = await listarDoctores();
         if (result.success) {
-        setDoctores(result.data);
+            setDoctores(result.data);
         } else {
-        Alert.alert("Error", result.message || "No se pudieron cargar los doctores");
+            Alert.alert("Error", result.message || "No se pudieron cargar los doctores");
         }
     } catch (error) {
         console.error("Error al cargar doctores:", error);
@@ -98,7 +96,7 @@ export default function ListarDoctores() {
 
                 <Button
                     title="Volver al Inicio"
-                    onPress={() => navigation.navigate("Inicio")}
+                    onPress={() => navigation.navigate("InicioHome")}
                     color="#4CAF50"
                 />
             </View>

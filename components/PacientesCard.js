@@ -1,11 +1,11 @@
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-export default function PacientesCard({ paciente, onEdit, onDelete }) {
+export default function PacientesCard({ paciente, onEdit, onDelete }) { 
     return (
         <View style={styles.card}>
             <View style={styles.info}>
-                <Text style={styles.nombre}>{paciente.usuario?.nombre || "Nombre no disponible"}</Text>
+                <Text style={styles.nombre}>{paciente.usuarios?.nombre || "Nombre no disponible"}</Text>
                 <Text style={styles.detalle}>Documento: {paciente.documento}</Text>
                 <Text style={styles.detalle}>Teléfono: {paciente.telefono}</Text>
                 <Text style={styles.detalle}>Dirección: {paciente.direccion}</Text>
@@ -23,6 +23,7 @@ export default function PacientesCard({ paciente, onEdit, onDelete }) {
         </View>
     );
 }
+
 
 // Función utilitaria para mostrar la fecha en formato legible
 function formatearFecha(fechaString) {
@@ -58,7 +59,6 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
         color: '#1A237E',
-        marginBottom: 4,
     },
     detalle: {
         fontSize: 14,

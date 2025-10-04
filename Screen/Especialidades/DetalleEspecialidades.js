@@ -6,7 +6,7 @@ import { obtenerdoctores } from "../../Src/Services/DoctoresService";
 export default function Detalledoctores() {
   const route = useRoute();
   const navigation = useNavigation();
-  const { doctoresId } = route.params;
+  const { idDoctores } = route.params;
 
   const [doctores, setdoctores] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -14,7 +14,7 @@ export default function Detalledoctores() {
   useEffect(() => {
     const cargar = async () => {
       try {
-        const result = await obtenerdoctores(doctoresId);
+        const result = await obtenerdoctores(idDoctores);
         if (result.success) setdoctores(result.data);
         else {
           Alert.alert("Error", result.message || "No se pudo cargar el doctores");
@@ -28,7 +28,7 @@ export default function Detalledoctores() {
       }
     };
     cargar();
-  }, [doctoresId]);
+  }, [idDoctores]);
 
   if (loading) return <Loading texto="Cargando doctores..." />;
   if (!doctores) return <Empty texto="No se encontró el doctores." />;

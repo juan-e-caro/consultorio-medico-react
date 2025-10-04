@@ -2,7 +2,9 @@ import { View, Text, TextInput, StyleSheet, Alert, ActivityIndicator } from 'rea
 import BottonComponent from '../../components/BottonComponent';
 import React, { useState } from 'react';
 import { registerUser } from '../../Src/Services/AuthService';
-import { Picker } from '@react-native-picker/picker'; // <-- Importa Picker
+import { Picker } from '@react-native-picker/picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 export default function RegistroScreen({ navigation }) {
     const [nombre, setNombre] = useState("");
@@ -32,7 +34,7 @@ export default function RegistroScreen({ navigation }) {
 
         if(result.success){
             Alert.alert("Registro exitoso", "Usuario registrado correctamente.");
-            navigation.replace("Inicio");
+            await AsyncStorage.setItem("userToken", result.token); 
         } else {
             Alert.alert("Error al registrar", result.message?.message || result.message);
         }
@@ -75,7 +77,6 @@ export default function RegistroScreen({ navigation }) {
                 editable={!loading}
             />
 
-            {/* Picker para seleccionar rol */}
             <View style={styles.pickerContainer}>
                 <Text style={styles.label}>Selecciona tu rol:</Text>
                 <Picker
@@ -83,11 +84,13 @@ export default function RegistroScreen({ navigation }) {
                     onValueChange={(itemValue) => setRol(itemValue)}
                     enabled={!loading}
                     style={styles.picker}
+                    dropdownIconColor="#1976D2" // Cambia el color de la flecha del dropdown (Android)
                 >
                     <Picker.Item label="Usuario" value="usuario" />
                     <Picker.Item label="Doctor" value="doctor" />
                 </Picker>
             </View>
+
 
             <BottonComponent
                 title={loading ? "" : "Registrarse"}
@@ -99,7 +102,7 @@ export default function RegistroScreen({ navigation }) {
 
             <BottonComponent
                 title="Iniciar sesión"
-                onPress={() => navigation.navigate("Login")}
+                onPress={() => navigation.navigate("login")}
                 style={{ backgroundColor: "#4CAF50", marginTop: 16 }}
             />
         </View>
@@ -110,41 +113,58 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: "center",
-        padding: 16,
+        paddingHorizontal: 24,
+        paddingVertical: 32,
         backgroundColor: "#E3F2FD",
     },
     title: {
-        fontSize: 26,
-        fontWeight: "bold",
-        marginBottom: 24,
+        fontSize: 28,
+        fontWeight: "700",
+        marginBottom: 30,
         textAlign: "center",
         color: "#0D47A1",
+        letterSpacing: 1,
     },
     input: {
-        height: 50,
+        height: 52,
         borderColor: "#90CAF9",
-        borderWidth: 1.5,
-        borderRadius: 8,
-        paddingHorizontal: 16,
-        marginBottom: 16,
+        borderWidth: 1.8,
+        borderRadius: 12,
+        paddingHorizontal: 20,
+        marginBottom: 18,
         backgroundColor: "#FFFFFF",
         color: "#0D47A1",
+        fontSize: 16,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.1,
+        shadowRadius: 3,
+        elevation: 2,
     },
     pickerContainer: {
         borderColor: "#90CAF9",
-        borderWidth: 1.5,
-        borderRadius: 8,
-        marginBottom: 16,
+        borderWidth: 1.8,
+        borderRadius: 12,
+        marginBottom: 18,
         backgroundColor: "#FFFFFF",
+        paddingVertical: 4,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.1,
+        shadowRadius: 3,
+        elevation: 2,
     },
     label: {
-        fontSize: 16,
+        fontSize: 17,
         color: "#0D47A1",
-        marginLeft: 12,
-        marginTop: 8,
+        marginLeft: 16,
+        marginBottom: 6,
+        fontWeight: "600",
     },
     picker: {
-        height: 50,
+        height: 54,
         color: "#0D47A1",
+        marginHorizontal: 12,
     },
 });
+

@@ -34,7 +34,7 @@ export default function Inicio({ navigation }) {
                 />
                 <CardComponent
                     title="doctores"
-                    description="Ver lista de doctoreses"
+                    description="Ver lista de doctores"
                     icon="medkit-outline"
                     onPress={() => navigation.navigate("ListarDoctores")}
                 />

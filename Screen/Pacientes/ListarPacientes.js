@@ -79,7 +79,7 @@ export default function ListarPacientes() {
                 keyExtractor={(item) => item.id.toString()}
                 renderItem={({ item }) => (
                     <PacientesCard
-                        pacientes={item}
+                        paciente={item}
                         onEdit={() => handleEditar(item)}
                         onDelete={() => handleEliminar(item.id)}
                     />
@@ -94,7 +94,7 @@ export default function ListarPacientes() {
 
                 <Button
                     title="Volver al Inicio"
-                    onPress={() => navigation.navigate("Inicio")}
+                    onPress={() => navigation.navigate("InicioHome")}
                     color="#4CAF50"
                 />
             </View>

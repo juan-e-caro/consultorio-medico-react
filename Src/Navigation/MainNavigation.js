@@ -28,15 +28,15 @@ export default function MainNavigation() {
             }}
         >
             <Tab.Screen 
-                name="Inicio"
-                component={InicioStack} 
-                options={{
-                    headerShown: false,
-                    tabBarIcon: ({ color, size }) => (
-                        <Ionicons name="home" size={size} color={color} />
-                    ),
-                    tabBarLabel: 'Inicio'
-                }}
+            name="Inicio"
+            component={InicioStack}
+            options={{
+                headerShown: false,
+                tabBarIcon: ({ color, size }) => (
+                <Ionicons name="home" size={size} color={color} />
+                ),
+                tabBarLabel: 'Inicio'
+            }}
             />
             <Tab.Screen 
                 name="Perfil" 

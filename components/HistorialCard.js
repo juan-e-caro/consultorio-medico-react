@@ -2,22 +2,24 @@ import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 export default function HistorialCard({ historial, onEdit, onDelete }) {
-    const nombrePaciente = historial.paciente?.usuario?.nombre || "Paciente no disponible";
-    const nombredoctores = historial.cita?.doctores?.usuario?.nombre || "doctores no disponible";
-    const fechaCita = formatearFecha(historial.cita?.fecha);
+    const nombrePaciente = historial.pacientes?.usuarios?.nombre || "Paciente no disponible";
+    const nombredoctores = historial.citas?.doctores?.usuarios?.nombre || "Doctor no disponible";
 
     return (
         <View style={styles.card}>
             <View style={styles.info}>
                 <Text style={styles.nombre}>{nombrePaciente}</Text>
-                <Text style={styles.detalle}>Fecha: {fechaCita}</Text>
-                <Text style={styles.detalle}>doctores: {nombredoctores}</Text>
+
+                <Text style={styles.detalle}>Doctor: {nombredoctores}</Text>
+
                 <Text style={styles.label}>Diagnóstico:</Text>
-                <Text style={styles.valor}>{historial.diagnostico}</Text>
+                <Text style={styles.detalle}>{historial.diagnostico}</Text>
+
                 <Text style={styles.label}>Tratamiento:</Text>
-                <Text style={styles.valor}>{historial.tratamiento}</Text>
+                <Text style={styles.detalle}>{historial.tratamiento}</Text>
+
                 <Text style={styles.label}>Observaciones:</Text>
-                <Text style={styles.valor}>{historial.observaciones}</Text>
+                <Text style={styles.detalle}>{historial.observaciones}</Text>
             </View>
             <View style={styles.actions}>
                 <TouchableOpacity onPress={onEdit} style={styles.iconBtn}>
@@ -30,6 +32,7 @@ export default function HistorialCard({ historial, onEdit, onDelete }) {
         </View>
     );
 }
+
 
 function formatearFecha(fechaStr) {
     if (!fechaStr) return "No especificada";

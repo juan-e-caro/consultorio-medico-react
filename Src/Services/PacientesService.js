@@ -15,7 +15,7 @@ export const listarPacientes = async () => {
 
 export const eliminarPacientes = async (id) => {
     try {
-        await api.delete(`/eliminarPacientes${id}`);
+        await api.delete(`/eliminarPacientes/${id}`);
         return { success: true};
     } catch (error) {
         console.error("Error al eliminar pacientes", error.response ? error.response.data : error.message);
@@ -26,7 +26,7 @@ export const eliminarPacientes = async (id) => {
     }
 }
 
-export const EditarPacientes = async (id,data) => {
+export const editarPacientes = async (id,data) => {
     try{
         const response = await api.put(`/actualizarPacientes/${id}`, data);
         return { success: true, data: response.data};

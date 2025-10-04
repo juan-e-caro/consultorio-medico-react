@@ -6,11 +6,11 @@ export default function HorariosCard({ horario, onEdit, onDelete }) {
         <View style={styles.card}>
             <View style={styles.info}>
                 <Text style={styles.nombre}>
-                    {horario.doctores?.usuario?.nombre || "doctores no disponible"}
+                    {horario.doctores?.usuarios?.nombre || "doctores no disponible"}
                 </Text>
                 <Text style={styles.detalle}>Día: {horario.diaSemana}</Text>
                 <Text style={styles.detalle}>Horario: {horario.horaInicio} - {horario.horaFin}</Text>
-                <Text style={styles.detalle}>Consultorio: #{horario.consultorio?.numero}</Text>
+                <Text style={styles.detalle}>Consultorio: {horario.consultorios?.numero}</Text>
             </View>
             <View style={styles.actions}>
                 <TouchableOpacity onPress={onEdit} style={styles.iconBtn}>

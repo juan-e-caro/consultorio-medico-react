@@ -23,7 +23,7 @@ export default function LoginScreen({ navigation }) {
 
         if(result.success){
             // Login correcto → navegar a inicio
-            navigation.replace("Inicio"); // replace evita volver al login
+            await AsyncStorage.setItem("userToken", result.token); 
         } else {
             Alert.alert("Error de autenticación", result.message?.message || result.message);
         }
@@ -34,7 +34,7 @@ export default function LoginScreen({ navigation }) {
             {/* --- Nombre y descripción de la app --- */}
             <Text style={styles.appName}>MediSys</Text>
             <Text style={styles.subtitle}>
-                Sistema de gestión de citas, pacientes y doctoreses
+                Sistema de gestión de citas, pacientes y doctores
             </Text>
 
             <Text style={styles.title}>Iniciar Sesión</Text>

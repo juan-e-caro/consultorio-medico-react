@@ -1,17 +1,17 @@
-// doctoresesStack.js
+// doctoresStack.js
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import Listardoctoreses from "../../../Screen/doctoresess/Listardoctoreses";
-import Detalledoctoreses from "../../../Screen/doctoreses/Detalledoctoreses";
-import Editardoctoreses from "../../../Screen/doctoreses/Editardoctoreses";
+import Listardoctores from "../../../Screen/doctores/ListarDoctores";
+import Detalledoctores from "../../../Screen/doctores/DetalleDoctores";
+import Editardoctores from "../../../Screen/doctores/EditarDoctores";
 
 const Stack = createNativeStackNavigator();
 
-export default function doctoresesStack() {
+export default function doctoresStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Listardoctoreses" component={Listardoctoreses} />
-      <Stack.Screen name="Detalledoctoreses" component={Detalledoctoreses} />
-      <Stack.Screen name="Editardoctoreses" component={Editardoctoreses} />
+      <Stack.Screen name="Listardoctores" component={Listardoctores} />
+      <Stack.Screen name="Detalledoctores" component={Detalledoctores} />
+      <Stack.Screen name="Editardoctores" component={Editardoctores} />
     </Stack.Navigator>
   );
 }

@@ -5,8 +5,8 @@ export default function doctoresCard({ doctores, onEdit, onDelete }) {
     return (
         <View style={styles.card}>
             <View style={styles.info}>
-                <Text style={styles.nombre}>{doctores.usuario?.nombre || "Nombre no disponible"}</Text>
-                <Text style={styles.especialidad}>Especialidad: {doctores.especialidad?.nombre || "No especificada"}</Text>
+                <Text style={styles.nombre}>{doctores.usuarios?.nombre || "Nombre no disponible"}</Text>
+                <Text style={styles.especialidad}>Especialidad: {doctores.especialidades?.nombre || "No especificada"}</Text>
                 <Text style={styles.detalle}>Cédula: {doctores.cedula}</Text>
                 <Text style={styles.detalle}>Teléfono: {doctores.telefono}</Text>
             </View>

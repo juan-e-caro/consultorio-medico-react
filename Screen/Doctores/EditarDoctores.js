@@ -1,64 +1,37 @@
 import { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  StyleSheet,
-  TouchableOpacity,
-  Alert,
-  ActivityIndicator,
-  ScrollView,
-  KeyboardAvoidingView,
-  Platform,
-} from "react-native";
+import {View,Text,TextInput,StyleSheet,TouchableOpacity,Alert,ActivityIndicator,ScrollView,KeyboardAvoidingView,Platform,} from "react-native";
 import { Picker } from "@react-native-picker/picker";
 
-// Importa tus servicios
-import {
-  creardoctores,
-  editardoctores,
-  obtenerUsuarios,
-  obtenerEspecialidades,
-} from "../../Src/Services/DoctoresService"; // Ajusta rutas si es necesario
+import {getUsuarios,getEspecialidades,editarDoctores,crearDoctores,} from "../../Src/Services/DoctoresService";
 
-export default function Editardoctores({ navigation, route }) {
-  const doctores = route.params?.doctores;
+export default function EditarDoctores({ navigation, route }) {
+  const doctor = route.params?.doctores;
 
   const [usuarios, setUsuarios] = useState([]);
   const [especialidades, setEspecialidades] = useState([]);
 
-  const [idUsuario, setIdUsuario] = useState(doctores ? doctores.idUsuario : "");
+  const [idUsuario, setIdUsuario] = useState(doctor ? doctor.idUsuario : "");
   const [idEspecialidad, setIdEspecialidad] = useState(
-    doctores ? doctores.idEspecialidad : ""
+    doctor ? doctor.idEspecialidad : ""
   );
-  const [cedula, setCedula] = useState(doctores ? doctores.cedula : "");
-  const [telefono, setTelefono] = useState(doctores ? doctores.telefono : "");
-
+  const [cedula, setCedula] = useState(doctor ? doctor.cedula : "");
+  const [telefono, setTelefono] = useState(doctor ? doctor.telefono : "");
   const [loading, setLoading] = useState(false);
-  const [loadingDatos, setLoadingDatos] = useState(true);
 
-  const esEdicion = !!doctores;
+  const esEdicion = !!doctor;
 
   useEffect(() => {
-    const cargarDatos = async () => {
-      setLoadingDatos(true);
+    const fetchData = async () => {
       try {
-        const usuariosRes = await obtenerUsuarios();
-        const especialidadesRes = await obtenerEspecialidades();
-
-        setUsuarios(usuariosRes || []);
-        setEspecialidades(especialidadesRes || []);
+        const usuariosData = await getUsuarios();
+        const especialidadesData = await getEspecialidades();
+        setUsuarios(usuariosData || []);
+        setEspecialidades(especialidadesData || []);
       } catch (error) {
-        Alert.alert(
-          "Error",
-          "No se pudieron cargar los datos necesarios para el formulario."
-        );
-      } finally {
-        setLoadingDatos(false);
+        Alert.alert("Error", "No se pudo cargar usuarios o especialidades");
       }
     };
-
-    cargarDatos();
+    fetchData();
   }, []);
 
   const handleGuardar = async () => {
@@ -71,12 +44,9 @@ export default function Editardoctores({ navigation, route }) {
     try {
       const payload = { idUsuario, idEspecialidad, cedula, telefono };
 
-      let result;
-      if (esEdicion) {
-        result = await editardoctores(doctores.id, payload);
-      } else {
-        result = await creardoctores(payload);
-      }
+      const result = esEdicion
+        ? await editarDoctores(doctor.id, payload)
+        : await crearDoctores(payload);
 
       if (result?.success) {
         Alert.alert(
@@ -100,17 +70,6 @@ export default function Editardoctores({ navigation, route }) {
     navigation.goBack();
   };
 
-  if (loadingDatos) {
-    return (
-      <View style={[styles.container, { justifyContent: "center", flex: 1 }]}>
-        <ActivityIndicator size="large" color="#0000ff" />
-        <Text style={{ textAlign: "center", marginTop: 10 }}>
-          Cargando datos...
-        </Text>
-      </View>
-    );
-  }
-
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -121,46 +80,61 @@ export default function Editardoctores({ navigation, route }) {
           {esEdicion ? "Editar Doctor" : "Nuevo Doctor"}
         </Text>
 
-        <Text>Selecciona el usuario</Text>
+        {/* Usuario */}
+        <Text style={styles.label}>Usuario:</Text>
         <Picker
           selectedValue={idUsuario}
-          onValueChange={(itemValue) => setIdUsuario(itemValue)}
+          onValueChange={setIdUsuario}
+          enabled={!loading}
           style={styles.input}
         >
-          <Picker.Item label="Selecciona un usuario" value="" />
-          {usuarios.map((user) => (
-            <Picker.Item key={user.id} label={user.nombre} value={user.id} />
+          <Picker.Item label="Seleccione un usuario" value="" />
+          {usuarios.map((usuario) => (
+            <Picker.Item
+              key={usuario.id}
+              label={usuario.nombre}
+              value={usuario.id}
+            />
           ))}
         </Picker>
 
-        <Text>Selecciona la especialidad</Text>
+        {/* Especialidad */}
+        <Text style={styles.label}>Especialidad:</Text>
         <Picker
           selectedValue={idEspecialidad}
-          onValueChange={(itemValue) => setIdEspecialidad(itemValue)}
+          onValueChange={setIdEspecialidad}
+          enabled={!loading}
           style={styles.input}
         >
-          <Picker.Item label="Selecciona una especialidad" value="" />
+          <Picker.Item label="Seleccione una especialidad" value="" />
           {especialidades.map((esp) => (
             <Picker.Item key={esp.id} label={esp.nombre} value={esp.id} />
           ))}
         </Picker>
 
+        {/* Cédula */}
+        <Text style={styles.label}>Cédula:</Text>
         <TextInput
           style={styles.input}
-          placeholder="Cédula"
-          keyboardType="numeric"
+          placeholder=""
           value={cedula}
           onChangeText={setCedula}
+          keyboardType="numeric"
+          editable={!loading}
         />
 
+        {/* Teléfono */}
+        <Text style={styles.label}>Teléfono:</Text>
         <TextInput
           style={styles.input}
-          placeholder="Teléfono"
-          keyboardType="phone-pad"
+          placeholder=""
           value={telefono}
           onChangeText={setTelefono}
+          keyboardType="phone-pad"
+          editable={!loading}
         />
 
+        {/* Botones */}
         {loading ? (
           <ActivityIndicator
             size="large"
@@ -170,9 +144,8 @@ export default function Editardoctores({ navigation, route }) {
         ) : (
           <>
             <TouchableOpacity
-              style={[styles.botonGuardar, loading && { opacity: 0.6 }]}
+              style={styles.botonGuardar}
               onPress={handleGuardar}
-              disabled={loading}
             >
               <Text style={styles.botonText}>
                 {esEdicion ? "Actualizar" : "Guardar"}
@@ -180,9 +153,8 @@ export default function Editardoctores({ navigation, route }) {
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.botonCancelar, loading && { opacity: 0.6 }]}
+              style={styles.botonCancelar}
               onPress={handleCancelar}
-              disabled={loading}
             >
               <Text style={styles.botonTextCancelar}>Cancelar</Text>
             </TouchableOpacity>
@@ -204,6 +176,13 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     fontWeight: "bold",
     textAlign: "center",
+    color: "#333",
+  },
+  label: {
+    marginBottom: 5,
+    fontWeight: "bold",
+    fontSize: 16,
+    color: "#333",
   },
   input: {
     borderWidth: 1,
@@ -211,6 +190,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 10,
     marginBottom: 15,
+    backgroundColor: "#fafafa",
+    fontSize: 16,
   },
   botonGuardar: {
     backgroundColor: "#28a745",
@@ -236,3 +217,4 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
+
