@@ -80,37 +80,37 @@ export default function EditarDoctores({ navigation, route }) {
           {esEdicion ? "Editar Doctor" : "Nuevo Doctor"}
         </Text>
 
-        {/* Usuario */}
-        <Text style={styles.label}>Usuario:</Text>
-        <Picker
-          selectedValue={idUsuario}
-          onValueChange={setIdUsuario}
-          enabled={!loading}
-          style={styles.input}
-        >
-          <Picker.Item label="Seleccione un usuario" value="" />
-          {usuarios.map((usuario) => (
-            <Picker.Item
-              key={usuario.id}
-              label={usuario.nombre}
-              value={usuario.id}
-            />
-          ))}
-        </Picker>
+      <Picker
+        selectedValue={idUsuario}
+        onValueChange={setIdUsuario}
+        enabled={!loading}
+        style={styles.input}
+      >
+        <Picker.Item label="Seleccione un usuario" value="" />
+        {usuarios.map((usuario) => (
+          <Picker.Item
+            key={usuario?.id}       // id único del usuario
+            label={usuario?.nombre} // solo el nombre
+            value={usuario.id}
+          />
+        ))}
+      </Picker>
 
-        {/* Especialidad */}
-        <Text style={styles.label}>Especialidad:</Text>
-        <Picker
-          selectedValue={idEspecialidad}
-          onValueChange={setIdEspecialidad}
-          enabled={!loading}
-          style={styles.input}
-        >
-          <Picker.Item label="Seleccione una especialidad" value="" />
-          {especialidades.map((esp) => (
-            <Picker.Item key={esp.id} label={esp.nombre} value={esp.id} />
-          ))}
-        </Picker>
+      <Picker
+        selectedValue={idEspecialidad}
+        onValueChange={setIdEspecialidad}
+        enabled={!loading}
+        style={styles.input}
+      >
+        <Picker.Item label="Seleccione una especialidad" value="" />
+        {especialidades.map((esp) => (
+          <Picker.Item
+            key={esp.id}         // id único de la especialidad
+            label={esp.nombre}   // solo el nombre
+            value={esp.id}
+          />
+        ))}
+      </Picker>
 
         {/* Cédula */}
         <Text style={styles.label}>Cédula:</Text>

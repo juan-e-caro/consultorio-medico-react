@@ -1,11 +1,11 @@
 import { View, Text, StyleSheet, ActivityIndicator, Alert, Image } from "react-native";
 import { useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import BottonComponent from "../../components/BottonComponent"; // Revisa que este botón esté bien diseñado
+import BottonComponent from "../../components/BottonComponent";
 import api from "../../Src/Services/Conexion";
 
 export default function PerfilScreen() {
-    const [usuario, setUsuario] = useState(null);
+    const [usuariosData, setUsuariosData] = useState(null);
     const [cargando, setCargando] = useState(true);
 
     useEffect(() => {
@@ -18,7 +18,7 @@ export default function PerfilScreen() {
                 }
 
                 const response = await api.get("/me");
-                setUsuario(response.data);
+                setUsuariosData(response.data); // Aquí viene "usuarios"
             } catch (error) {
                 console.error("Error al cargar el perfil:", error);
 
@@ -79,7 +79,7 @@ export default function PerfilScreen() {
         );
     }
 
-    if (!usuario) {
+    if (!usuariosData || !usuariosData.usuarios) {
         return (
             <View style={styles.container}>
                 <Text style={styles.title}>Perfil de Usuario</Text>
@@ -90,37 +90,41 @@ export default function PerfilScreen() {
         );
     }
 
-    const { name, email } = usuario.user;
+    const { nombre, email } = usuariosData.usuarios;
 
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Perfil de Usuario</Text>
 
             <View style={styles.card}>
-                {/* Avatar de ejemplo */}
                 <Image
                     style={styles.avatar}
                     source={{
-                        uri: "https://ui-avatars.com/api/?name=" + encodeURIComponent(name || "User"),
+                        uri: "https://ui-avatars.com/api/?name=" + encodeURIComponent(nombre || "Usuario"),
                     }}
                 />
 
-                {/* Info del perfil */}
-                <Text style={styles.label}><Text style={styles.labelTitle}>Nombre:</Text> {name || "No disponible"}</Text>
+                <Text style={styles.label}><Text style={styles.labelTitle}>Nombre:</Text> {nombre || "No disponible"}</Text>
                 <Text style={styles.label}><Text style={styles.labelTitle}>Correo:</Text> {email || "No disponible"}</Text>
 
-                {/* Separador */}
                 <View style={styles.divider} />
 
-                {/* Botón personalizado */}
+                <BottonComponent
+                    title="Editar usuario"
+                    onPress={() => {
+                        Alert.alert("Editar usuario", "Esta funcionalidad aún no está disponible.");
+                    }}
+                    color="#0d6efd"
+                    style={{ marginBottom: 10 }}
+                />
+
                 <BottonComponent
                     title="Cerrar sesión"
                     onPress={async () => {
                         await AsyncStorage.removeItem("userToken");
                         Alert.alert("Sesión cerrada", "Has cerrado sesión correctamente.");
-                        // Puedes redirigir al login si lo necesitas aquí
                     }}
-                    color="#dc3545"
+                    color="#D32F2F"
                 />
             </View>
         </View>
@@ -186,3 +190,4 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
 });
+

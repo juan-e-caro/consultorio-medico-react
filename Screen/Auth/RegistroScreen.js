@@ -2,7 +2,6 @@ import { View, Text, TextInput, StyleSheet, Alert, ActivityIndicator } from 'rea
 import BottonComponent from '../../components/BottonComponent';
 import React, { useState } from 'react';
 import { registerUser } from '../../Src/Services/AuthService';
-import { Picker } from '@react-native-picker/picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
@@ -11,7 +10,7 @@ export default function RegistroScreen({ navigation }) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmarPassword, setConfirmarPassword] = useState("");
-    const [rol, setRol] = useState("usuario");  // Estado para el rol, default "usuario"
+    const [rol, setRol] = useState("Paciente");  // Estado para el rol, default "usuario"
     const [loading, setLoading] = useState(false);
 
     const handleRegister = async () => {
@@ -28,7 +27,7 @@ export default function RegistroScreen({ navigation }) {
         setLoading(true);
 
         // Envía el rol también
-        const result = await registerUser(nombre, email, password, confirmarPassword, rol);
+        const result = await registerUser(nombre, email, password, confirmarPassword, "Paciente");
 
         setLoading(false);
 
@@ -76,21 +75,6 @@ export default function RegistroScreen({ navigation }) {
                 onChangeText={setConfirmarPassword}
                 editable={!loading}
             />
-
-            <View style={styles.pickerContainer}>
-                <Text style={styles.label}>Selecciona tu rol:</Text>
-                <Picker
-                    selectedValue={rol}
-                    onValueChange={(itemValue) => setRol(itemValue)}
-                    enabled={!loading}
-                    style={styles.picker}
-                    dropdownIconColor="#1976D2" // Cambia el color de la flecha del dropdown (Android)
-                >
-                    <Picker.Item label="Usuario" value="usuario" />
-                    <Picker.Item label="Doctor" value="doctor" />
-                </Picker>
-            </View>
-
 
             <BottonComponent
                 title={loading ? "" : "Registrarse"}

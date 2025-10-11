@@ -17,11 +17,11 @@ export const loginUser = async (email, password) => {
   }
 };
 
-export const registerUser = async (name, email, password, password_confirmation, roles) => {
+export const registerUser = async (nombre, email, password, password_confirmation, roles) => {
   try {
-    console.log({ name, email, password, password_confirmation, roles });
+    console.log({ nombre, email, password, password_confirmation, roles });
     const response = await api.post('/registrar', {
-      name,
+      nombre,
       email,
       password,
       password_confirmation,
