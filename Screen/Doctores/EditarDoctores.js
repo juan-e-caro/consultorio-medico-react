@@ -2,7 +2,9 @@ import { useState, useEffect } from "react";
 import {View,Text,TextInput,StyleSheet,TouchableOpacity,Alert,ActivityIndicator,ScrollView,KeyboardAvoidingView,Platform,} from "react-native";
 import { Picker } from "@react-native-picker/picker";
 
-import {getUsuarios,getEspecialidades,editarDoctores,crearDoctores,} from "../../Src/Services/DoctoresService";
+import {editarDoctores,crearDoctores} from "../../Src/Services/DoctoresService";
+import {listarUsuarios} from "../../Src/Services/UsuariosService";
+import {listarEspecialidades} from "../../Src/Services/EspecialidadesService";
 
 export default function EditarDoctores({ navigation, route }) {
   const doctor = route.params?.doctores;
@@ -11,9 +13,7 @@ export default function EditarDoctores({ navigation, route }) {
   const [especialidades, setEspecialidades] = useState([]);
 
   const [idUsuario, setIdUsuario] = useState(doctor ? doctor.idUsuario : "");
-  const [idEspecialidad, setIdEspecialidad] = useState(
-    doctor ? doctor.idEspecialidad : ""
-  );
+  const [idEspecialidad, setIdEspecialidad] = useState(doctor ? doctor.idEspecialidad : "");
   const [cedula, setCedula] = useState(doctor ? doctor.cedula : "");
   const [telefono, setTelefono] = useState(doctor ? doctor.telefono : "");
   const [loading, setLoading] = useState(false);
@@ -23,10 +23,30 @@ export default function EditarDoctores({ navigation, route }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const usuariosData = await getUsuarios();
-        const especialidadesData = await getEspecialidades();
-        setUsuarios(usuariosData || []);
-        setEspecialidades(especialidadesData || []);
+        const usuariosResponse = await listarUsuarios();
+        const especialidadesResponse = await listarEspecialidades();
+
+        if (usuariosResponse.success) {
+          const doctores = usuariosResponse.data.filter(
+            (usuario) => usuario.roles === "Doctor"
+          );
+          setUsuarios(doctores);
+        } else {
+          console.warn("Fallo al cargar usuarios:", usuariosResponse.message);
+          setUsuarios([]);
+        }
+
+        if (especialidadesResponse.success) {
+          setEspecialidades(especialidadesResponse.data);
+        } else {
+          console.warn("Fallo al cargar especialidades:", especialidadesResponse.message);
+          setEspecialidades([]);
+        }
+
+        if (doctor) {
+          setIdUsuario(doctor.idUsuario || "");
+          setIdEspecialidad(doctor.idEspecialidad || "");
+        }
       } catch (error) {
         Alert.alert("Error", "No se pudo cargar usuarios o especialidades");
       }
@@ -81,33 +101,34 @@ export default function EditarDoctores({ navigation, route }) {
         </Text>
 
       <Picker
-        selectedValue={idUsuario}
-        onValueChange={setIdUsuario}
+        selectedValue={String(idUsuario)}
+        onValueChange={(value) => setIdUsuario(Number(value))}
         enabled={!loading}
         style={styles.input}
       >
         <Picker.Item label="Seleccione un usuario" value="" />
         {usuarios.map((usuario) => (
           <Picker.Item
-            key={usuario?.id}       // id único del usuario
-            label={usuario?.nombre} // solo el nombre
-            value={usuario.id}
+            key={usuario.id}
+            label={usuario.nombre}
+            value={String(usuario.id)}
           />
         ))}
       </Picker>
 
+
       <Picker
         selectedValue={idEspecialidad}
-        onValueChange={setIdEspecialidad}
+        onValueChange={(value) => setIdEspecialidad(value)}
         enabled={!loading}
         style={styles.input}
       >
         <Picker.Item label="Seleccione una especialidad" value="" />
-        {especialidades.map((esp) => (
+        {especialidades.map((especialidad) => (
           <Picker.Item
-            key={esp.id}         // id único de la especialidad
-            label={esp.nombre}   // solo el nombre
-            value={esp.id}
+            key={especialidad.id}
+            label={especialidad.nombre}
+            value={especialidad.id}
           />
         ))}
       </Picker>

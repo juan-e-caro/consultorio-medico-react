@@ -38,3 +38,19 @@ export const editarHorarios = async (id,data) => {
         };
     }
 };
+
+export const crearHorarios = async (data) => {
+  try {
+    const response = await api.post("/crearHorarios", data);
+    return { success: true, data: response.data };
+  } catch (error) {
+    console.error(
+      "error al crear Horarios:",
+      error.response ? error.response.data : error.message
+    );
+    return {
+      success: false,
+      message: error.response ? error.response.data : "error de conexión",
+    };
+  }
+};

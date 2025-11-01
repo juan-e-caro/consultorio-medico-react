@@ -1,8 +1,19 @@
 import { ScrollView, StatusBar, Alert, Button, View, Text, StyleSheet } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import CardComponent from "../../components/CardComponent";
+import React, { useEffect, useState } from "react";
 
 export default function Inicio({ navigation }) {
+    const [role, setRole] = useState(null);
+
+    useEffect(() => {
+        const fetchRole = async () => {
+            const storedRole = await AsyncStorage.getItem("userRole");
+            if (storedRole) setRole(storedRole);
+        };
+        fetchRole();
+    }, []);
+
     const handleLogout = async () => {
         try {
             await AsyncStorage.removeItem("userToken");
@@ -11,6 +22,7 @@ export default function Inicio({ navigation }) {
             console.error("Error cerrando sesión:", error);
             Alert.alert("Error", "No se pudo cerrar sesión.");
         }
+        await AsyncStorage.clear();
     };
 
     return (
@@ -20,61 +32,124 @@ export default function Inicio({ navigation }) {
             <View style={styles.header}>
                 <Text style={styles.headerTitle}>Bienvenido</Text>
                 <Text style={styles.headerSubtitle}>
-                    Estado: <Text style={styles.statusText}>Habilitado</Text>
+                    Rol: <Text style={styles.statusText}>{role}</Text>
                 </Text>
                 <Text style={styles.headerSubtitle}>Selecciona una opción</Text>
             </View>
 
             <View style={styles.gridContainer}>
-                <CardComponent
-                    title="Usuarios"
-                    description="Ver lista de usuarios"
-                    icon="person-outline"
-                    onPress={() => navigation.navigate("ListarUsuarios")}
-                />
-                <CardComponent
-                    title="doctores"
-                    description="Ver lista de doctores"
-                    icon="medkit-outline"
-                    onPress={() => navigation.navigate("ListarDoctores")}
-                />
-                <CardComponent
-                    title="Especialidades"
-                    description="Ver lista de especialidades"
-                    icon="list-outline"
-                    onPress={() => navigation.navigate("ListarEspecialidades")}
-                />
-                <CardComponent
-                    title="Pacientes"
-                    description="Ver lista de pacientes"
-                    icon="people-outline"
-                    onPress={() => navigation.navigate("ListarPacientes")}
-                />
-                <CardComponent
-                    title="Consultorios"
-                    description="Ver lista de consultorios"
-                    icon="home-outline"
-                    onPress={() => navigation.navigate("ListarConsultorios")}
-                />
-                <CardComponent
-                    title="Horarios"
-                    description="Ver horarios disponibles"
-                    icon="time-outline"
-                    onPress={() => navigation.navigate("ListarHorarios")}
-                />
-                <CardComponent
-                    title="Citas"
-                    description="Ver citas agendadas"
-                    icon="calendar-outline"
-                    onPress={() => navigation.navigate("ListarCitas")}
-                />
-                <CardComponent
-                    title="Historial Médico"
-                    description="Ver historial médico"
-                    icon="clipboard-outline"
-                    onPress={() => navigation.navigate("ListarHistorial")}
-                />
+                {role === "Admin" && (
+                    <>
+                        <CardComponent
+                            title="Usuarios"
+                            description="Ver lista de usuarios"
+                            icon="person-outline"
+                            onPress={() => navigation.navigate("ListarUsuarios")}
+                        />
+                        <CardComponent
+                            title="Doctores"
+                            description="Ver lista de doctores"
+                            icon="medkit-outline"
+                            onPress={() => navigation.navigate("ListarDoctores")}
+                        />
+                        <CardComponent
+                            title="Especialidades"
+                            description="Ver lista de especialidades"
+                            icon="list-outline"
+                            onPress={() => navigation.navigate("ListarEspecialidades")}
+                        />
+                        <CardComponent
+                            title="Pacientes"
+                            description="Ver lista de pacientes"
+                            icon="people-outline"
+                            onPress={() => navigation.navigate("ListarPacientes")}
+                        />
+                        <CardComponent
+                            title="Consultorios"
+                            description="Ver lista de consultorios"
+                            icon="home-outline"
+                            onPress={() => navigation.navigate("ListarConsultorios")}
+                        />
+                        <CardComponent
+                            title="Horarios"
+                            description="Ver horarios disponibles"
+                            icon="time-outline"
+                            onPress={() => navigation.navigate("ListarHorarios")}
+                        />
+                        <CardComponent
+                            title="Citas"
+                            description="Ver citas agendadas"
+                            icon="calendar-outline"
+                            onPress={() => navigation.navigate("ListarCitas")}
+                        />
+                        <CardComponent
+                            title="Historial Médico"
+                            description="Ver historial médico"
+                            icon="clipboard-outline"
+                            onPress={() => navigation.navigate("ListarHistorial")}
+                        />
+                    </>
+                )}
+
+                {role === "Doctor" && (
+                    <>
+                        <CardComponent
+                            title="Horarios"
+                            description="Administrar tus horarios"
+                            icon="time-outline"
+                            onPress={() => navigation.navigate("ListarHorarios")}
+                        />
+                        <CardComponent
+                            title="Citas"
+                            description="Ver y actualizar citas"
+                            icon="calendar-outline"
+                            onPress={() => navigation.navigate("ListarCitas")}
+                        />
+                        <CardComponent
+                            title="Historial Médico"
+                            description="Gestionar historiales de pacientes"
+                            icon="clipboard-outline"
+                            onPress={() => navigation.navigate("ListarHistorial")}
+                        />
+                    </>
+                )}
+
+                {role === "Paciente" && (
+                    <>
+                        <CardComponent
+                            title="Doctores"
+                            description="Ver lista de doctores"
+                            icon="medkit-outline"
+                            onPress={() => navigation.navigate("ListarDoctores")}
+                        />
+                        <CardComponent
+                            title="Especialidades"
+                            description="Explorar especialidades médicas"
+                            icon="list-outline"
+                            onPress={() => navigation.navigate("ListarEspecialidades")}
+                        />
+                        <CardComponent
+                            title="Horarios"
+                            description="Ver horarios disponibles"
+                            icon="time-outline"
+                            onPress={() => navigation.navigate("ListarHorarios")}
+                        />
+                        <CardComponent
+                            title="Citas"
+                            description="Agendar o ver tus citas"
+                            icon="calendar-outline"
+                            onPress={() => navigation.navigate("ListarCitas")}
+                        />
+                        <CardComponent
+                            title="Historial Médico"
+                            description="Ver tu historial médico"
+                            icon="clipboard-outline"
+                            onPress={() => navigation.navigate("ListarHistorial")}
+                        />
+                    </>
+                )}
             </View>
+
 
             <View style={{ padding: 16 }}>
                 <Button

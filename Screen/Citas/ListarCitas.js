@@ -30,8 +30,8 @@ export default function ListarCitas() {
         return () => unsubscribe();
     }, [navigation]);
 
-    const handleEditar = (citas) => {
-        navigation.navigate("EditarCitas", { citas });
+    const handleEditar = (cita) => {
+        navigation.navigate("EditarCitas", { cita });
     };
 
     const handleCrear = () => {

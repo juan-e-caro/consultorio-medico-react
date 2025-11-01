@@ -30,8 +30,8 @@ export default function ListarHorarios() {
         return () => unsubscribe();
     }, [navigation]);
 
-    const handleEditar = (horarios) => {
-        navigation.navigate("EditarHorarios", { horarios });
+    const handleEditar = (horario) => {
+        navigation.navigate("EditarHorarios", { horario });
     };
 
     const handleCrear = () => {

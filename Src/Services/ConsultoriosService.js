@@ -38,3 +38,20 @@ export const EditarConsultorios = async (id,data) => {
         };
     }
 };
+
+export const crearConsultorios = async (data) => {
+  try {
+    const response = await api.post("/crearConsultorios", data);
+    return { success: true, data: response.data };
+  } catch (error) {
+    console.error(
+      "error al crear Consultorios:",
+      error.response ? error.response.data : error.message
+    );
+    return {
+      success: false,
+      message: error.response ? error.response.data : "error de conexión",
+    };
+  }
+};
+

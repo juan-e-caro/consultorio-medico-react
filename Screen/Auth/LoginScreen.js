@@ -18,12 +18,14 @@ export default function LoginScreen({ navigation }) {
         setLoading(true);
 
         const result = await loginUser(email, password);
+        console.log("Resultado del login:", result);
 
         setLoading(false);
 
         if(result.success){
             // Login correcto → navegar a inicio
-            await AsyncStorage.setItem("userToken", result.token); 
+            await AsyncStorage.setItem("userToken", result.access_token);
+            await AsyncStorage.setItem("userRole", result.usuarios.roles); 
         } else {
             Alert.alert("Error de autenticación", result.message?.message || result.message);
         }

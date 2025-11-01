@@ -30,8 +30,8 @@ export default function ListarConsultorios() {
         return () => unsubscribe();
     }, [navigation]);
 
-    const handleEditar = (consultorios) => {
-        navigation.navigate("EditarConsultorios", { consultorios });
+    const handleEditar = (consultorio) => {
+        navigation.navigate("EditarConsultorios", { consultorio });
     };
 
     const handleCrear = () => {

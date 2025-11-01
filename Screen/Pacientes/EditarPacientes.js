@@ -1,130 +1,187 @@
-import { useState } from "react";
-import {View,Text,TextInput,StyleSheet,TouchableOpacity,Alert,ActivityIndicator,ScrollView,KeyboardAvoidingView,Platform,} from "react-native";
-import { crearPaciente, EditarPaciente } from "../../Src/Services/PacientesService";
+import { useEffect, useState } from "react";
+import {View,Text,TextInput,StyleSheet,TouchableOpacity,Alert, ActivityIndicator,ScrollView,KeyboardAvoidingView,Platform,} from "react-native";
+import { Picker } from "@react-native-picker/picker";
+import DateTimePicker from "@react-native-community/datetimepicker";
+
+import { crearPacientes, editarPacientes } from "../../Src/Services/PacientesService";
+import { listarUsuarios } from "../../Src/Services/UsuariosService";
 
 export default function EditarPacientes({ navigation, route }) {
   const paciente = route.params?.paciente;
 
-  const [nombre, setNombre] = useState(paciente ? paciente.nombre : "");
+  const [usuarios, setUsuarios] = useState([]);
+  const [idUsuario, setIdUsuario] = useState(paciente ? String(paciente.idUsuario) : "");
   const [documento, setDocumento] = useState(paciente ? paciente.documento : "");
   const [telefono, setTelefono] = useState(paciente ? paciente.telefono : "");
   const [direccion, setDireccion] = useState(paciente ? paciente.direccion : "");
-  const [nacimiento, setNacimiento] = useState(paciente ? paciente.nacimiento : "");
-  const [genero, setGenero] = useState(paciente ? paciente.genero : "");
+  const [nacimiento, setNacimiento] = useState(
+    paciente && paciente.nacimiento ? new Date(paciente.nacimiento) : new Date()
+  );
+  const [genero, setGenero] = useState(paciente ? paciente.genero : "Masculino");
+  const [showPicker, setShowPicker] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const esEdicion = !!paciente;
 
+  useEffect(() => {
+    async function fetchUsuarios() {
+      try {
+        const response = await listarUsuarios();
+        if (response.success) {
+          const pacientesUsuarios = response.data.filter(
+            (usuario) => usuario.roles === "Paciente"
+          );
+          setUsuarios(pacientesUsuarios);
+        } else {
+          setUsuarios([]);
+          Alert.alert("Error", "No se pudieron cargar los usuarios.");
+        }
+      } catch (error) {
+        Alert.alert("Error", "No se pudo conectar al servidor.");
+      }
+    }
+    fetchUsuarios();
+  }, []);
+
   const handleGuardar = async () => {
-    if (!nombre || !documento || !telefono || !direccion || !nacimiento || !genero) {
+    if (!idUsuario || !documento || !telefono || !direccion || !nacimiento || !genero) {
       Alert.alert("Campos requeridos", "Por favor completa todos los campos");
+      return;
+    }
+
+    if (nacimiento > new Date()) {
+      Alert.alert("Fecha inválida", "La fecha de nacimiento no puede ser futura");
       return;
     }
 
     setLoading(true);
     try {
-      const payload = { nombre, documento, telefono, direccion, nacimiento, genero };
+      const payload = {
+        idUsuario: String(idUsuario),
+        documento,
+        telefono,
+        direccion,
+        nacimiento: nacimiento.toISOString().split("T")[0],
+        genero,
+      };
 
-      let result;
-      if (esEdicion) {
-        result = await EditarPacientes(paciente.id, payload);
-      } else {
-        result = await crearPaciente(payload);
-      }
+      const result = esEdicion
+        ? await editarPacientes(paciente.id, payload)
+        : await crearPacientes(payload);
 
-      if (result?.success) {
+      if (result.success) {
         Alert.alert(
           "Éxito",
-          esEdicion
-            ? "Paciente actualizado correctamente"
-            : "Paciente creado correctamente"
+          esEdicion ? "Paciente actualizado correctamente" : "Paciente creado correctamente"
         );
         navigation.goBack();
       } else {
-        Alert.alert("Error", result?.message || "No se pudo guardar el paciente");
+        Alert.alert("Error", result.message || "No se pudo guardar el paciente");
       }
     } catch (error) {
-      Alert.alert("Error", "No se pudo guardar el paciente");
+      Alert.alert("Error", "Error al guardar el paciente");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCancelar = () => {
-    navigation.goBack();
-  };
+  const handleCancelar = () => navigation.goBack();
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-      style={{ flex: 1 }}
-    >
+    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.title}>
           {esEdicion ? "Editar Paciente" : "Nuevo Paciente"}
         </Text>
 
-        <TextInput
+        {/* Usuario */}
+        <Text style={styles.label}>Usuario:</Text>
+        <Picker
+          selectedValue={idUsuario}
+          onValueChange={(value) => setIdUsuario(value)}
           style={styles.input}
-          placeholder="Nombre"
-          value={nombre}
-          onChangeText={setNombre}
-        />
+          enabled={!loading}
+        >
+          <Picker.Item label="Seleccione un usuario" value="" />
+          {usuarios.map((usuario) => (
+            <Picker.Item key={usuario.id} label={usuario.nombre} value={String(usuario.id)} />
+          ))}
+        </Picker>
 
+        {/* Documento */}
+        <Text style={styles.label}>Documento:</Text>
         <TextInput
           style={styles.input}
-          placeholder="Documento"
+          placeholder="Ingrese documento"
           keyboardType="numeric"
           value={documento}
           onChangeText={setDocumento}
+          editable={!loading}
         />
 
+        {/* Teléfono */}
+        <Text style={styles.label}>Teléfono:</Text>
         <TextInput
           style={styles.input}
-          placeholder="Teléfono"
+          placeholder="Ingrese teléfono"
           keyboardType="phone-pad"
           value={telefono}
           onChangeText={setTelefono}
+          editable={!loading}
         />
 
+        {/* Dirección */}
+        <Text style={styles.label}>Dirección:</Text>
         <TextInput
           style={styles.input}
-          placeholder="Dirección"
+          placeholder="Ingrese dirección"
           value={direccion}
           onChangeText={setDireccion}
+          editable={!loading}
         />
 
-        <TextInput
-          style={styles.input}
-          placeholder="Fecha de nacimiento (YYYY-MM-DD)"
-          value={nacimiento}
-          onChangeText={setNacimiento}
-        />
+        {/* Fecha de nacimiento */}
+        <Text style={styles.label}>Fecha de nacimiento:</Text>
+        <TouchableOpacity
+          style={styles.dateButton}
+          onPress={() => setShowPicker(true)}
+          disabled={loading}
+        >
+          <Text>{nacimiento.toISOString().split("T")[0]}</Text>
+        </TouchableOpacity>
 
+        {showPicker && (
+          <DateTimePicker
+            value={nacimiento}
+            mode="date"
+            display="default"
+            onChange={(event, selectedDate) => {
+              setShowPicker(false);
+              if (selectedDate) setNacimiento(selectedDate);
+            }}
+          />
+        )}
+
+        {/* Género */}
         <Text style={styles.label}>Género:</Text>
-        <View style={styles.generoContainer}>
-          {["Masculino", "Femenino", "Otro"].map((item) => (
-            <TouchableOpacity
-              key={item}
-              style={[styles.generoButton, genero === item && styles.generoSelected]}
-              onPress={() => setGenero(item)}
-              disabled={loading}
-            >
-              <Text
-                style={[styles.generoText, genero === item && styles.generoTextSelected]}
-              >
-                {item}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+        <Picker
+          selectedValue={genero}
+          onValueChange={(value) => setGenero(value)}
+          style={styles.input}
+          enabled={!loading}
+        >
+          <Picker.Item label="Masculino" value="Masculino" />
+          <Picker.Item label="Femenino" value="Femenino" />
+          <Picker.Item label="Otro" value="Otro" />
+        </Picker>
 
+        {/* Botones */}
         {loading ? (
           <ActivityIndicator size="large" color="#0000ff" style={{ marginTop: 20 }} />
         ) : (
           <>
             <TouchableOpacity
-              style={[styles.botonGuardar, loading && { opacity: 0.6 }]}
+              style={styles.botonGuardar}
               onPress={handleGuardar}
               disabled={loading}
             >
@@ -134,7 +191,7 @@ export default function EditarPacientes({ navigation, route }) {
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.botonCancelar, loading && { opacity: 0.6 }]}
+              style={styles.botonCancelar}
               onPress={handleCancelar}
               disabled={loading}
             >
@@ -170,30 +227,13 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     fontWeight: "bold",
   },
-  generoContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 20,
-  },
-  generoButton: {
-    flex: 1,
-    padding: 10,
-    marginHorizontal: 5,
+  dateButton: {
     borderWidth: 1,
-    borderColor: "#888",
+    borderColor: "#ccc",
     borderRadius: 8,
+    padding: 10,
+    marginBottom: 15,
     alignItems: "center",
-  },
-  generoSelected: {
-    backgroundColor: "#007bff",
-    borderColor: "#007bff",
-  },
-  generoText: {
-    color: "#000",
-  },
-  generoTextSelected: {
-    color: "#fff",
-    fontWeight: "bold",
   },
   botonGuardar: {
     backgroundColor: "#28a745",

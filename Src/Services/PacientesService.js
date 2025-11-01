@@ -38,3 +38,19 @@ export const editarPacientes = async (id,data) => {
         };
     }
 };
+
+export const crearPacientes = async (data) => {
+  try {
+    const response = await api.post("/crearPacientes", data);
+    return { success: true, data: response.data };
+  } catch (error) {
+    console.error(
+      "error al crear Pacientes:",
+      error.response ? error.response.data : error.message
+    );
+    return {
+      success: false,
+      message: error.response ? error.response.data : "error de conexión",
+    };
+  }
+};

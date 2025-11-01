@@ -1,132 +1,180 @@
-import { View, Text, FlatList, ActivityIndicator, TouchableOpacity, StyleSheet, Alert, Button } from "react-native";
+import { 
+  View, 
+  Text, 
+  FlatList, 
+  ActivityIndicator, 
+  TouchableOpacity, 
+  StyleSheet, 
+  Alert, 
+  RefreshControl 
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { listarHistorial, eliminarHistorial } from "../../Src/Services/HistorialService";
 import HistorialCard from "../../components/HistorialCard";
 
 export default function ListarHistorial() {
-    const [historial, setHistorial] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const navigation = useNavigation();
+  const [historial, setHistorial] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const navigation = useNavigation();
 
-    const handleHistorial = async () => {
-        setLoading(true);
-        try {
-            const result = await listarHistorial();
-            if(result.success){
-                setHistorial(result.data);
-            } else {
-                Alert.alert("Error", result.message || "No se pudo cargar el historial");
-            }
-        } catch (error) {
-            Alert.alert("Error", "No se pudo cargar el historial");
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        const unsubscribe = navigation.addListener('focus', handleHistorial);
-        return () => unsubscribe();
-    }, [navigation]);
-
-    const handleEditar = (historial) => {
-        navigation.navigate("EditarHistorial", { historial });
-    };
-
-    const handleCrear = () => {
-        navigation.navigate("EditarHistorial");
-    };
-
-    const handleEliminar = (id) => {
-        Alert.alert(
-            "Confirmar eliminación",
-            "¿Estás seguro de que deseas eliminar este historial?",
-            [
-                { text: "Cancelar", style: "cancel" },
-                { 
-                    text: "Eliminar", 
-                    style: "destructive",
-                    onPress: async () => {
-                        try {
-                            const result = await eliminarHistorial(id);
-                            if(result.success){
-                                handleHistorial();
-                            } else {
-                                Alert.alert("Error", result.message || "No se pudo eliminar el historial");
-                            }
-                        } catch (error) {
-                            Alert.alert("Error", "No se pudo eliminar el historial");
-                        }
-                    }
-                }
-            ]
-        );
-    };
-
-    if (loading) {
-        return (
-            <View style={styles.centered}>
-                <ActivityIndicator size="large" color="#1976D2"/>
-            </View>
-        );
+  const handleHistorial = useCallback(async () => {
+    try {
+      const result = await listarHistorial();
+      if (result.success) {
+        setHistorial(result.data);
+      } else {
+        Alert.alert("Error", result.message || "No se pudo cargar el historial");
+      }
+    } catch (error) {
+      Alert.alert("Error", "No se pudo cargar el historial");
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
     }
+  }, []);
 
-    return (
-        <View style={{ flex: 1 }}>
-            <FlatList
-                data={historial}
-                keyExtractor={(item) => item.id.toString()}
-                renderItem={({ item }) => (
-                    <HistorialCard
-                        historial={item}
-                        onEdit={() => handleEditar(item)}
-                        onDelete={() => handleEliminar(item.id)}
-                    />
-                )}
-                ListEmptyComponent={<Text style={styles.empty}>No hay historial registrado</Text>}
-            />
+  useEffect(() => {
+    handleHistorial();
+    const unsubscribe = navigation.addListener("focus", handleHistorial);
+    return unsubscribe;
+  }, [navigation, handleHistorial]);
 
-            <View style={styles.botonesContainer}>
-                <TouchableOpacity style={styles.botonCrear} onPress={handleCrear}>
-                    <Text style={styles.textoBoton}>Nuevo Historial</Text>
-                </TouchableOpacity>
+  const handleEditar = (historial) => {
+    navigation.navigate("EditarHistorial", { historial });
+  };
 
-                <Button
-                    title="Volver al Inicio"
-                    onPress={() => navigation.navigate("InicioHome")}
-                    color="#4CAF50"
-                />
-            </View>
-        </View>
+  const handleCrear = () => {
+    navigation.navigate("EditarHistorial");
+  };
+
+  const handleEliminar = (id) => {
+    Alert.alert(
+      "Confirmar eliminación",
+      "¿Estás seguro de que deseas eliminar este historial?",
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Eliminar",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              const result = await eliminarHistorial(id);
+              if (result.success) {
+                handleHistorial();
+              } else {
+                Alert.alert("Error", result.message || "No se pudo eliminar el historial");
+              }
+            } catch (error) {
+              Alert.alert("Error", "No se pudo eliminar el historial");
+            }
+          },
+        },
+      ]
     );
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color="#007bff" />
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Historial de Pacientes</Text>
+
+      <FlatList
+        data={historial}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => (
+          <HistorialCard
+            historial={item}
+            onEdit={() => handleEditar(item)}
+            onDelete={() => handleEliminar(item.id)}
+          />
+        )}
+        ListEmptyComponent={
+          <Text style={styles.empty}>No hay historial registrado</Text>
+        }
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={() => {
+              setRefreshing(true);
+              handleHistorial();
+            }}
+          />
+        }
+      />
+
+      <View style={styles.botonesContainer}>
+        <TouchableOpacity style={styles.botonGuardar} onPress={handleCrear}>
+          <Text style={styles.botonText}>Nuevo Historial</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.botonCancelar}
+          onPress={() => navigation.navigate("InicioHome")}
+        >
+          <Text style={styles.botonTextCancelar}>Volver al Inicio</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-    centered: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-    },
-    empty: {
-        textAlign: "center",
-        marginTop: 40,
-        color: "#888",
-        fontSize: 16,
-    },
-    botonesContainer: {
-        padding: 16,
-    },
-    botonCrear: {
-        backgroundColor: "#1976D2",
-        padding: 16,
-        borderRadius: 8,
-        marginBottom: 16,
-        alignItems: "center",
-    },
-    textoBoton: {
-        color: "#fff",
-        fontSize: 16,
-        fontWeight: "bold",
-    },
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    padding: 20,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 20,
+  },
+  centered: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#fff",
+  },
+  empty: {
+    textAlign: "center",
+    marginTop: 40,
+    color: "#888",
+    fontSize: 16,
+  },
+  botonesContainer: {
+    marginTop: 20,
+  },
+  botonGuardar: {
+    backgroundColor: "#1976D2",
+    padding: 15,
+    borderRadius: 8,
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  botonCancelar: {
+    backgroundColor: "#D32F2F",
+    padding: 15,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  botonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  botonTextCancelar: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
 });

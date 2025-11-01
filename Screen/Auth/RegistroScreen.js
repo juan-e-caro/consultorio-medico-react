@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import { registerUser } from '../../Src/Services/AuthService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-
 export default function RegistroScreen({ navigation }) {
     const [nombre, setNombre] = useState("");
     const [email, setEmail] = useState("");
@@ -33,7 +32,8 @@ export default function RegistroScreen({ navigation }) {
 
         if(result.success){
             Alert.alert("Registro exitoso", "Usuario registrado correctamente.");
-            await AsyncStorage.setItem("userToken", result.token); 
+            await AsyncStorage.setItem("userToken", result.access_token);
+            await AsyncStorage.setItem("userRole", "Paciente");
         } else {
             Alert.alert("Error al registrar", result.message?.message || result.message);
         }

@@ -4,11 +4,16 @@ import api from "./Conexion";
 export const loginUser = async (email, password) => {
   try {
     const response = await api.post('/login', { email, password });
-    const token = response.data.access_token;
-    if (token) {
-      await AsyncStorage.setItem("userToken", token);
+
+    // Guardar el token si existe
+    if (response.data.access_token) {
+      await AsyncStorage.setItem("userToken", response.data.access_token);
+      await AsyncStorage.setItem("userData", JSON.stringify(response.data.usuarios));
     }
-    return { success: true, token };
+
+    // Devolver todo el JSON del backend
+    return response.data;
+
   } catch (error) {
     return {
       success: false,
@@ -16,6 +21,7 @@ export const loginUser = async (email, password) => {
     };
   }
 };
+
 
 export const registerUser = async (nombre, email, password, password_confirmation, roles) => {
   try {

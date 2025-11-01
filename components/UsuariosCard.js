@@ -7,7 +7,7 @@ export default function UsuariosCard({ usuarios, onEdit, onDelete }) {
             <View style={styles.info}>
                 <Text style={styles.nombre}>{usuarios.nombre}</Text>
                 <Text style={styles.email}>{usuarios.email}</Text>
-                <Text style={styles.rol}>Rol: {usuarios.rol}</Text>
+                <Text style={styles.rol}>Rol: {usuarios.roles}</Text>
             </View>
             <View style={styles.actions}>
                 <TouchableOpacity onPress={onEdit} style={styles.iconBtn}>

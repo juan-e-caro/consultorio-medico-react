@@ -89,7 +89,7 @@ export default function ListarUsuarios() {
 
             <View style={styles.botonesContainer}>
                 <TouchableOpacity style={styles.botonCrear} onPress={handleCrear}>
-                    <Text style={styles.textoBoton}>+ Nuevo Usuario</Text>
+                    <Text style={styles.textoBoton}>Nuevo Usuario</Text>
                 </TouchableOpacity>
 
                 <Button

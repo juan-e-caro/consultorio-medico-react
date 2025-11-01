@@ -30,8 +30,8 @@ export default function ListarPacientes() {
         return () => unsubscribe();
     }, [navigation]);
 
-    const handleEditar = (pacientes) => {
-        navigation.navigate("EditarPacientes", { pacientes });
+    const handleEditar = (paciente) => {
+        navigation.navigate("EditarPacientes", { paciente });
     };
 
     const handleCrear = () => {

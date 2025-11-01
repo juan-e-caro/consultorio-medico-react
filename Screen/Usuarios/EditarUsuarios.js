@@ -1,25 +1,25 @@
 import { useState } from "react";
 import {View,Text,TextInput,StyleSheet,TouchableOpacity,Alert,ActivityIndicator,ScrollView,KeyboardAvoidingView,Platform,} from "react-native";
-import { crearUsuarios, EditarUsuarios } from "../../Src/Services/UsuariosService";
+import {crearUsuarios,EditarUsuarios} from "../../Src/Services/UsuariosService";
 
 export default function EditarUsuario({ navigation, route }) {
   const usuario = route.params?.usuario;
+  const desdePerfil = route.params?.desdePerfil || false;
 
-  const [nombre, setNombre] = useState(usuario ? usuario.nombre : "");
+  const [nombre, setNombre] = useState(usuario ? usuario.name || usuario.nombre : "");
   const [email, setEmail] = useState(usuario ? usuario.email : "");
   const [password, setPassword] = useState("");
-  const [rol, setRol] = useState(usuario ? usuario.rol : "");
+  const [roles, setRoles] = useState(usuario ? usuario.roles : "");
   const [loading, setLoading] = useState(false);
 
   const esEdicion = !!usuario;
 
   const handleGuardar = async () => {
-    if (!nombre || !email || !rol) {
+    if (!nombre || !email || (!roles && !desdePerfil)) {
       Alert.alert("Campos requeridos", "Por favor completa todos los campos");
       return;
     }
 
-    // Validación básica de correo
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       Alert.alert("Correo inválido", "Por favor ingresa un correo válido");
@@ -28,7 +28,8 @@ export default function EditarUsuario({ navigation, route }) {
 
     setLoading(true);
     try {
-      const payload = { nombre, email, rol };
+      const payload = { name: nombre, email };
+      if (!desdePerfil) payload.roles = roles; // solo admins cambian roles
       if (password) payload.password = password;
 
       let result;
@@ -41,9 +42,17 @@ export default function EditarUsuario({ navigation, route }) {
       if (result?.success) {
         Alert.alert(
           "Éxito",
-          esEdicion ? "Usuario actualizado correctamente" : "Usuario creado correctamente"
+          esEdicion
+            ? desdePerfil
+              ? "Tu perfil ha sido actualizado"
+              : "Usuario actualizado correctamente"
+            : "Usuario creado correctamente"
         );
-        navigation.goBack();
+        if (desdePerfil) {
+          navigation.navigate("PerfilScreen");
+        } else {
+          navigation.goBack();
+        }
       } else {
         Alert.alert("Error", result?.message || "No se pudo guardar el usuario");
       }
@@ -55,7 +64,11 @@ export default function EditarUsuario({ navigation, route }) {
   };
 
   const handleCancelar = () => {
-    navigation.goBack();
+    if (desdePerfil) {
+      navigation.navigate("PerfilScreen");
+    } else {
+      navigation.goBack();
+    }
   };
 
   return (
@@ -65,7 +78,11 @@ export default function EditarUsuario({ navigation, route }) {
     >
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.title}>
-          {esEdicion ? "Editar Usuario" : "Nuevo Usuario"}
+          {desdePerfil
+            ? "Editar mi perfil"
+            : esEdicion
+            ? "Editar Usuario"
+            : "Nuevo Usuario"}
         </Text>
 
         <TextInput
@@ -92,23 +109,28 @@ export default function EditarUsuario({ navigation, route }) {
           onChangeText={setPassword}
         />
 
-        <Text style={styles.label}>Rol:</Text>
-        <View style={styles.rolesContainer}>
-          {["paciente", "doctores", "administrador"].map((item) => (
-            <TouchableOpacity
-              key={item}
-              style={[styles.rolButton, rol === item && styles.rolSelected]}
-              onPress={() => setRol(item)}
-              disabled={loading}
-            >
-              <Text
-                style={[styles.rolText, rol === item && styles.rolTextSelected]}
-              >
-                {item.charAt(0).toUpperCase() + item.slice(1)}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+        {/* Solo mostrar los roles si NO viene desde perfil */}
+        {!desdePerfil && (
+          <>
+            <Text style={styles.label}>Rol:</Text>
+            <View style={styles.rolesContainer}>
+              {["Admin", "Doctor", "Paciente"].map((item) => (
+                <TouchableOpacity
+                  key={item}
+                  style={[styles.rolButton, roles === item && styles.rolSelected]}
+                  onPress={() => setRoles(item)}
+                  disabled={loading}
+                >
+                  <Text
+                    style={[styles.rolText, roles === item && styles.rolTextSelected]}
+                  >
+                    {item}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </>
+        )}
 
         {loading ? (
           <ActivityIndicator size="large" color="#0000ff" style={{ marginTop: 20 }} />
@@ -137,6 +159,7 @@ export default function EditarUsuario({ navigation, route }) {
     </KeyboardAvoidingView>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {

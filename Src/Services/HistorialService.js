@@ -38,3 +38,19 @@ export const EditarHistorial = async (id,data) => {
         };
     }
 };
+
+export const crearHistorial = async (data) => {
+  try {
+    const response = await api.post("/crearHistorial", data);
+    return { success: true, data: response.data };
+  } catch (error) {
+    console.error(
+      "error al crear Historiales:",
+      error.response ? error.response.data : error.message
+    );
+    return {
+      success: false,
+      message: error.response ? error.response.data : "error de conexión",
+    };
+  }
+};

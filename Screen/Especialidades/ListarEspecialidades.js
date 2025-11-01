@@ -30,8 +30,8 @@ export default function ListarEspecialidades() {
         return () => unsubscribe();
     }, [navigation]);
 
-    const handleEditar = (especialidades) => {
-        navigation.navigate("EditarEspecialidades", { especialidades });
+    const handleEditar = (especialidad) => {
+        navigation.navigate("EditarEspecialidades", { especialidad });
     };
 
     const handleCrear = () => {
