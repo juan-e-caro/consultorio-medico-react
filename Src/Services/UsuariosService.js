@@ -15,7 +15,7 @@ export const listarUsuarios = async () => {
 
 export const eliminarUsuarios = async (id) => {
     try {
-        await api.delete(`/eliminarUsuarios${id}`);
+        await api.delete(`/eliminarUsuarios/${id}`);
         return { success: true};
     } catch (error) {
         console.error("Error al eliminar usuarios", error.response ? error.response.data : error.message);

@@ -40,9 +40,6 @@ export default function DetalleHorario() {
         <Text style={styles.label}>doctores:</Text>
         <Text style={styles.value}>{horario.doctoresNombre}</Text>
 
-        <Text style={styles.label}>Día:</Text>
-        <Text style={styles.value}>{horario.dia}</Text>
-
         <Text style={styles.label}>Hora inicio:</Text>
         <Text style={styles.value}>{horario.horaInicio}</Text>
 

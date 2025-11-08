@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -11,12 +11,9 @@ import {
   Platform,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
-import {
-  crearHorarios,
-  editarHorarios,
-  listarHorariosPorDoctor, // <- asegúrate de tener este servicio
-} from "../../Src/Services/HorariosService";
+import { crearHorarios, EditarHorarios } from "../../Src/Services/HorariosService";
 import { listarDoctores } from "../../Src/Services/DoctoresService";
 import { listarConsultorios } from "../../Src/Services/ConsultoriosService";
 
@@ -25,114 +22,92 @@ export default function EditarHorario({ navigation, route }) {
 
   const [doctores, setDoctores] = useState([]);
   const [consultorios, setConsultorios] = useState([]);
-  const [horariosDoctor, setHorariosDoctor] = useState([]);
 
   const [idDoctor, setIdDoctor] = useState(horario ? String(horario.idDoctor) : "");
-  const [dia, setDia] = useState(horario ? horario.diaSemana : "");
-  const [idConsultorio, setIdConsultorio] = useState(horario ? horario.idConsultorio : "");
+  const [idConsultorio, setIdConsultorio] = useState(
+    horario ? String(horario.idConsultorio) : ""
+  );
+  const [horaInicio, setHoraInicio] = useState(
+    horario ? new Date(`2025-01-01T${horario.horaInicio}`) : new Date()
+  );
+  const [horaFin, setHoraFin] = useState(
+    horario ? new Date(`2025-01-01T${horario.horaFin}`) : new Date()
+  );
 
+  const [showInicioPicker, setShowInicioPicker] = useState(false);
+  const [showFinPicker, setShowFinPicker] = useState(false);
   const [loading, setLoading] = useState(false);
+
   const esEdicion = !!horario;
 
-  // Cargar doctores y consultorios
   useEffect(() => {
-    const fetchData = async () => {
+    async function fetchData() {
       try {
-        const doctoresResponse = await listarDoctores();
-        const consultoriosResponse = await listarConsultorios();
+        const [resDoctores, resConsultorios] = await Promise.all([
+          listarDoctores(),
+          listarConsultorios(),
+        ]);
 
-        if (doctoresResponse.success) setDoctores(doctoresResponse.data || []);
-        else console.warn("Fallo al cargar doctores:", doctoresResponse.message);
-
-        if (consultoriosResponse.success) setConsultorios(consultoriosResponse.data || []);
-        else console.warn("Fallo al cargar consultorios:", consultoriosResponse.message);
-
+        if (resDoctores.success) setDoctores(resDoctores.data || []);
+        if (resConsultorios.success) setConsultorios(resConsultorios.data || []);
       } catch (error) {
-        console.error(error);
-        Alert.alert("Error", "No se pudo cargar doctores o consultorios");
+        Alert.alert("Error", "No se pudieron cargar los datos.");
       }
-    };
+    }
     fetchData();
   }, []);
 
-  // Cargar horarios relacionados con el doctor seleccionado
-  useEffect(() => {
-    const fetchHorariosDoctor = async () => {
-      if (!idDoctor) {
-        setHorariosDoctor([]);
-        return;
-      }
-
-      try {
-        const response = await listarHorarios();
-        if (response.success) {
-          const filtrados = response.data.filter(
-            (h) => String(h.idDoctor) === String(idDoctor)
-          );
-          setHorariosDoctor(filtrados);
-        } else {
-          console.warn("Fallo al cargar horarios:", response.message);
-          setHorariosDoctor([]);
-        }
-      } catch (error) {
-        console.error("Error al obtener horarios:", error);
-        Alert.alert("Error", "No se pudieron obtener los horarios");
-        setHorariosDoctor([]);
-      }
-    };
-
-    fetchHorariosDoctor();
-  }, [idDoctor]);
-
-
-
   const handleGuardar = async () => {
-    if (!idDoctor || !dia || !idConsultorio) {
+    if (!idDoctor || !idConsultorio || !horaInicio || !horaFin) {
       Alert.alert("Campos requeridos", "Por favor completa todos los campos");
       return;
     }
 
-    setLoading(true);
+    // Validación simple de rango horario
+    if (horaInicio >= horaFin) {
+      Alert.alert("Error", "La hora de inicio debe ser menor que la hora de fin");
+      return;
+    }
 
+    // Función para formatear a HH:mm
+    const formatTime = (date) => {
+      const hours = date.getHours().toString().padStart(2, "0");
+      const minutes = date.getMinutes().toString().padStart(2, "0");
+      return `${hours}:${minutes}`;
+    };
+
+    setLoading(true);
     try {
       const payload = {
         idDoctor: Number(idDoctor),
-        diaSemana: dia,
         idConsultorio: Number(idConsultorio),
+        horaInicio: formatTime(horaInicio),
+        horaFin: formatTime(horaFin),
       };
 
       const result = esEdicion
-        ? await editarHorarios(horario.id, payload)
+        ? await EditarHorarios(horario.id, payload)
         : await crearHorarios(payload);
 
-      if (result?.success) {
+      if (result.success) {
         Alert.alert(
           "Éxito",
           esEdicion ? "Horario actualizado correctamente" : "Horario creado correctamente"
         );
         navigation.goBack();
       } else {
-        Alert.alert("Error", result?.message || "No se pudo guardar el horario");
+        Alert.alert("Error", result.message || "No se pudo guardar el horario");
       }
     } catch (error) {
-      console.error(error);
-      Alert.alert("Error", "No se pudo guardar el horario");
+      console.error("Error al guardar horario:", error);
+      Alert.alert("Error", "Error al guardar el horario");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCancelar = () => navigation.goBack();
 
-  const diasSemana = [
-    { label: "Lunes", value: "Lunes" },
-    { label: "Martes", value: "Martes" },
-    { label: "Miércoles", value: "Miércoles" },
-    { label: "Jueves", value: "Jueves" },
-    { label: "Viernes", value: "Viernes" },
-    { label: "Sábado", value: "Sábado" },
-    { label: "Domingo", value: "Domingo" },
-  ];
+  const handleCancelar = () => navigation.goBack();
 
   return (
     <KeyboardAvoidingView
@@ -144,6 +119,7 @@ export default function EditarHorario({ navigation, route }) {
           {esEdicion ? "Editar Horario" : "Nuevo Horario"}
         </Text>
 
+        {/* Doctor */}
         <Text style={styles.label}>Doctor:</Text>
         <Picker
           selectedValue={idDoctor}
@@ -152,39 +128,16 @@ export default function EditarHorario({ navigation, route }) {
           enabled={!loading}
         >
           <Picker.Item label="Seleccione un doctor" value="" />
-          {doctores.map((doctor) => (
+          {doctores.map((doc) => (
             <Picker.Item
-              key={doctor.id}
-              label={doctor.usuarios?.nombre || doctor.nombre || "Sin nombre"}
-              value={String(doctor.id)}
+              key={doc.id}
+              label={doc.usuarios?.nombre || doc.nombre || "Sin nombre"}
+              value={String(doc.id)}
             />
           ))}
         </Picker>
 
-        {idDoctor !== "" && horariosDoctor.length > 0 && (
-          <View style={styles.input}>
-            <Text style={styles.label}>Horarios actuales del doctor:</Text>
-            {horariosDoctor.map((h) => (
-              <Text key={h.id} style={{ marginVertical: 3 }}>
-                • {h.diaSemana}: Consultorio {h.consultorio?.numero || h.idConsultorio}
-              </Text>
-            ))}
-          </View>
-        )}
-
-        <Text style={styles.label}>Día:</Text>
-        <Picker
-          selectedValue={dia}
-          onValueChange={(value) => setDia(value)}
-          style={styles.input}
-          enabled={!loading}
-        >
-          <Picker.Item label="Seleccione un día" value="" />
-          {diasSemana.map((d) => (
-            <Picker.Item key={d.value} label={d.label} value={d.value} />
-          ))}
-        </Picker>
-
+        {/* Consultorio */}
         <Text style={styles.label}>Consultorio:</Text>
         <Picker
           selectedValue={idConsultorio}
@@ -193,21 +146,64 @@ export default function EditarHorario({ navigation, route }) {
           enabled={!loading}
         >
           <Picker.Item label="Seleccione un consultorio" value="" />
-          {consultorios.map((con) => (
-            <Picker.Item
-              key={con.id}
-              label={`Consultorio ${con.numero}`}
-              value={String(con.id)}
-            />
+          {consultorios.map((c) => (
+            <Picker.Item key={c.id} label={c.numero} value={String(c.id)} />
           ))}
         </Picker>
 
+        {/* Hora de inicio */}
+        <Text style={styles.label}>Hora de inicio:</Text>
+        <TouchableOpacity
+          style={styles.dateButton}
+          onPress={() => setShowInicioPicker(true)}
+          disabled={loading}
+        >
+          <Text>{horaInicio.toTimeString().split(" ")[0]}</Text>
+        </TouchableOpacity>
+
+        {showInicioPicker && (
+          <DateTimePicker
+            value={horaInicio}
+            mode="time"
+            is24Hour
+            display="default"
+            onChange={(event, selectedDate) => {
+              setShowInicioPicker(false);
+              if (selectedDate) setHoraInicio(selectedDate);
+            }}
+          />
+        )}
+
+        {/* Hora de fin */}
+        <Text style={styles.label}>Hora de fin:</Text>
+        <TouchableOpacity
+          style={styles.dateButton}
+          onPress={() => setShowFinPicker(true)}
+          disabled={loading}
+        >
+          <Text>{horaFin.toTimeString().split(" ")[0]}</Text>
+        </TouchableOpacity>
+
+        {showFinPicker && (
+          <DateTimePicker
+            value={horaFin}
+            mode="time"
+            is24Hour
+            display="default"
+            onChange={(event, selectedDate) => {
+              setShowFinPicker(false);
+              if (selectedDate) setHoraFin(selectedDate);
+            }}
+          />
+        )}
+
+        {/* Botones */}
         {loading ? (
           <ActivityIndicator size="large" color="#0000ff" style={{ marginTop: 20 }} />
         ) : (
           <>
             <TouchableOpacity
-              style={[styles.botonGuardar, loading && { opacity: 0.6 }]}
+              style={styles.botonGuardar}
               onPress={handleGuardar}
               disabled={loading}
             >
@@ -217,7 +213,7 @@ export default function EditarHorario({ navigation, route }) {
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.botonCancelar, loading && { opacity: 0.6 }]}
+              style={styles.botonCancelar}
               onPress={handleCancelar}
               disabled={loading}
             >
@@ -253,15 +249,13 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 15,
   },
-  horariosBox: {
-    backgroundColor: "#f5f5f5",
-    padding: 10,
+  dateButton: {
+    borderWidth: 1,
+    borderColor: "#ccc",
     borderRadius: 8,
+    padding: 10,
     marginBottom: 15,
-  },
-  horarioItem: {
-    fontSize: 14,
-    marginLeft: 10,
+    alignItems: "center",
   },
   botonGuardar: {
     backgroundColor: "#28a745",

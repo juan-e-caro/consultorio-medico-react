@@ -8,7 +8,6 @@ export default function HorariosCard({ horario, onEdit, onDelete }) {
                 <Text style={styles.nombre}>
                     {horario.doctores?.usuarios?.nombre || "doctores no disponible"}
                 </Text>
-                <Text style={styles.detalle}>Día: {horario.diaSemana}</Text>
                 <Text style={styles.detalle}>Horario: {horario.horaInicio} - {horario.horaFin}</Text>
                 <Text style={styles.detalle}>Consultorio: {horario.consultorios?.numero}</Text>
             </View>

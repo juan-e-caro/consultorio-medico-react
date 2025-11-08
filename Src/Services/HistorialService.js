@@ -15,7 +15,7 @@ export const listarHistorial = async () => {
 
 export const eliminarHistorial = async (id) => {
     try {
-        await api.delete(`/eliminarHistorial${id}`);
+        await api.delete(`/eliminarHistorial/${id}`);
         return { success: true};
     } catch (error) {
         console.error("Error al eliminar Historial", error.response ? error.response.data : error.message);

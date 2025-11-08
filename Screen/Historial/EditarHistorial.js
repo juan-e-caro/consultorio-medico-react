@@ -1,6 +1,18 @@
 import { useEffect, useState } from "react";
-import {View,Text,TextInput,StyleSheet,TouchableOpacity,Alert,ActivityIndicator,ScrollView,KeyboardAvoidingView,Platform,} from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native";
 import { Picker } from "@react-native-picker/picker";
+
 import { crearHistorial, editarHistorial } from "../../Src/Services/HistorialService";
 import { listarPacientes } from "../../Src/Services/PacientesService";
 import { listarCitas } from "../../Src/Services/CitasService";
@@ -29,30 +41,21 @@ export default function EditarHistorial({ navigation, route }) {
         ]);
 
         if (pacientesResponse.success) {
-          const listaPacientes = pacientesResponse.data.filter(
-            (usuario) => usuario.roles === "Paciente"
-          );
-          setPacientes(listaPacientes);
-          if (!idPaciente && listaPacientes.length > 0) {
-            setIdPaciente(String(listaPacientes[0].idUsuario));
-          }
+          setPacientes(pacientesResponse.data || []);
         } else {
-          console.warn("Fallo al cargar pacientes:", pacientesResponse.message);
           setPacientes([]);
+          Alert.alert("Error", "No se pudieron cargar los pacientes");
         }
 
         if (citasResponse.success) {
-          setCitas(citasResponse.data);
-          if (!idCita && citasResponse.data.length > 0) {
-            setIdCita(String(citasResponse.data[0].idCita));
-          }
+          setCitas(citasResponse.data || []);
         } else {
-          console.warn("Fallo al cargar citas:", citasResponse.message);
           setCitas([]);
+          Alert.alert("Error", "No se pudieron cargar las citas");
         }
       } catch (error) {
         console.error(error);
-        Alert.alert("Error", "No se pudo cargar pacientes o citas");
+        Alert.alert("Error", "No se pudo cargar la información del servidor");
       }
     };
 
@@ -60,17 +63,16 @@ export default function EditarHistorial({ navigation, route }) {
   }, []);
 
   const handleGuardar = async () => {
-    if (!diagnostico.trim()) {
-      Alert.alert("Campo requerido", "Debes ingresar un diagnóstico.");
+    if (!idPaciente || !idCita || !diagnostico.trim()) {
+      Alert.alert("Campos requeridos", "Por favor completa los campos obligatorios");
       return;
     }
 
     setLoading(true);
     try {
       const payload = {
-        idPacientes: idPaciente,
-        idCitas: idCita,
-        fecha: cita?.fecha,
+        idPaciente: Number(idPaciente),
+        idCita: Number(idCita),
         diagnostico: diagnostico.trim(),
         tratamiento: tratamiento.trim(),
         observaciones: observaciones.trim(),
@@ -110,39 +112,40 @@ export default function EditarHistorial({ navigation, route }) {
         </Text>
 
         {/* Paciente */}
+        <Text style={styles.label}>Paciente:</Text>
         <Picker
           selectedValue={idPaciente}
-          onValueChange={(value) => setIdPaciente(Number(value))}
+          onValueChange={(value) => setIdPaciente(value)}
           enabled={!loading}
           style={styles.input}
         >
           <Picker.Item label="Seleccione un paciente" value="" />
           {pacientes.map((paciente) => (
             <Picker.Item
-              key={paciente.idUsuario}
-              label={paciente.nombre} // o paciente.usuario?.nombre según tu API
-              value={String(paciente.idUsuario)}
+              key={paciente.id}
+              label={paciente.nombre || paciente.usuarios?.nombre || "Sin nombre"}
+              value={String(paciente.id)}
             />
           ))}
         </Picker>
 
         {/* Cita */}
+        <Text style={styles.label}>Cita:</Text>
         <Picker
-          selectedValue={String(idCita)}
-          onValueChange={(value) => setIdCita(Number(value))}
+          selectedValue={idCita}
+          onValueChange={(value) => setIdCita(value)}
           enabled={!loading}
           style={styles.input}
         >
-          <Picker.Item label="Seleccione una fecha" value="" />
+          <Picker.Item label="Seleccione una cita" value="" />
           {citas.map((cita) => (
             <Picker.Item
-              key={cita.idCita}
-              label={new Date(cita.fecha).toLocaleDateString("es-ES")}
-              value={String(cita.idCita)}
+              key={cita.id}
+              label={cita.fecha ? cita.fecha : "Sin fecha"}
+              value={String(cita.id)}
             />
           ))}
         </Picker>
-
 
         {/* Diagnóstico */}
         <Text style={styles.label}>Diagnóstico:</Text>
@@ -151,6 +154,7 @@ export default function EditarHistorial({ navigation, route }) {
           placeholder="Ingrese diagnóstico"
           value={diagnostico}
           onChangeText={setDiagnostico}
+          editable={!loading}
         />
 
         {/* Tratamiento */}
@@ -161,6 +165,7 @@ export default function EditarHistorial({ navigation, route }) {
           value={tratamiento}
           onChangeText={setTratamiento}
           multiline
+          editable={!loading}
         />
 
         {/* Observaciones */}
@@ -171,14 +176,18 @@ export default function EditarHistorial({ navigation, route }) {
           value={observaciones}
           onChangeText={setObservaciones}
           multiline
+          editable={!loading}
         />
 
+        {/* Botones */}
         {loading ? (
           <ActivityIndicator size="large" color="#1976D2" style={{ marginTop: 20 }} />
         ) : (
           <>
             <TouchableOpacity style={styles.botonGuardar} onPress={handleGuardar}>
-              <Text style={styles.botonText}>{esEdicion ? "Actualizar" : "Guardar"}</Text>
+              <Text style={styles.botonText}>
+                {esEdicion ? "Actualizar" : "Guardar"}
+              </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -193,7 +202,6 @@ export default function EditarHistorial({ navigation, route }) {
     </KeyboardAvoidingView>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
@@ -210,15 +218,6 @@ const styles = StyleSheet.create({
   label: {
     fontWeight: "bold",
     marginBottom: 5,
-  },
-  readOnly: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    padding: 10,
-    marginBottom: 15,
-    backgroundColor: "#f9f9f9",
-    color: "#555",
   },
   input: {
     borderWidth: 1,

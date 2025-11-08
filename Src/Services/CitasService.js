@@ -15,7 +15,7 @@ export const listarCitas = async () => {
 
 export const eliminarCitas = async (id) => {
     try {
-        await api.delete(`/eliminarCitas${id}`);
+        await api.delete(`/eliminarCitas/${id}`);
         return { success: true};
     } catch (error) {
         console.error("Error al eliminar Citas", error.response ? error.response.data : error.message);
