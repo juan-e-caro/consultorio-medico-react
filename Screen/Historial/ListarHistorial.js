@@ -6,7 +6,7 @@ import {
   TouchableOpacity, 
   StyleSheet, 
   Alert, 
-  RefreshControl 
+  Button 
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useEffect, useState, useCallback } from "react";
@@ -16,10 +16,10 @@ import HistorialCard from "../../components/HistorialCard";
 export default function ListarHistorial() {
   const [historial, setHistorial] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
   const navigation = useNavigation();
 
   const handleHistorial = useCallback(async () => {
+    setLoading(true);
     try {
       const result = await listarHistorial();
       if (result.success) {
@@ -31,7 +31,6 @@ export default function ListarHistorial() {
       Alert.alert("Error", "No se pudo cargar el historial");
     } finally {
       setLoading(false);
-      setRefreshing(false);
     }
   }, []);
 
@@ -78,15 +77,13 @@ export default function ListarHistorial() {
   if (loading) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#007bff" />
+        <ActivityIndicator size="large" color="#1976D2" />
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Historial de Pacientes</Text>
-
+    <View style={{ flex: 1 }}>
       <FlatList
         data={historial}
         keyExtractor={(item) => item.id.toString()}
@@ -97,53 +94,29 @@ export default function ListarHistorial() {
             onDelete={() => handleEliminar(item.id)}
           />
         )}
-        ListEmptyComponent={
-          <Text style={styles.empty}>No hay historial registrado</Text>
-        }
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={() => {
-              setRefreshing(true);
-              handleHistorial();
-            }}
-          />
-        }
+        ListEmptyComponent={<Text style={styles.empty}>No hay historial registrado</Text>}
       />
 
       <View style={styles.botonesContainer}>
-        <TouchableOpacity style={styles.botonGuardar} onPress={handleCrear}>
-          <Text style={styles.botonText}>Nuevo Historial</Text>
+        <TouchableOpacity style={styles.botonCrear} onPress={handleCrear}>
+          <Text style={styles.textoBoton}>Nuevo Historial</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.botonCancelar}
+        <Button
+          title="Volver al Inicio"
           onPress={() => navigation.navigate("InicioHome")}
-        >
-          <Text style={styles.botonTextCancelar}>Volver al Inicio</Text>
-        </TouchableOpacity>
+          color="#4CAF50"
+        />
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    padding: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 20,
-  },
   centered: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#fff",
   },
   empty: {
     textAlign: "center",
@@ -152,27 +125,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   botonesContainer: {
-    marginTop: 20,
+    padding: 16,
   },
-  botonGuardar: {
+  botonCrear: {
     backgroundColor: "#1976D2",
-    padding: 15,
+    padding: 16,
     borderRadius: 8,
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  botonCancelar: {
-    backgroundColor: "#D32F2F",
-    padding: 15,
-    borderRadius: 8,
+    marginBottom: 16,
     alignItems: "center",
   },
-  botonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  botonTextCancelar: {
+  textoBoton: {
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",

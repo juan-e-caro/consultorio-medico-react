@@ -22,6 +22,7 @@ export default function EditarHistorial({ navigation, route }) {
 
   const [pacientes, setPacientes] = useState([]);
   const [citas, setCitas] = useState([]);
+  const [todasLasCitas, setTodasLasCitas] = useState([]); // 🔹 Guardamos todas las citas para filtrar localmente
 
   const [idPaciente, setIdPaciente] = useState(historial ? String(historial.idPaciente) : "");
   const [idCita, setIdCita] = useState(historial ? String(historial.idCita) : "");
@@ -43,14 +44,12 @@ export default function EditarHistorial({ navigation, route }) {
         if (pacientesResponse.success) {
           setPacientes(pacientesResponse.data || []);
         } else {
-          setPacientes([]);
           Alert.alert("Error", "No se pudieron cargar los pacientes");
         }
 
         if (citasResponse.success) {
-          setCitas(citasResponse.data || []);
+          setTodasLasCitas(citasResponse.data || []);
         } else {
-          setCitas([]);
           Alert.alert("Error", "No se pudieron cargar las citas");
         }
       } catch (error) {
@@ -61,6 +60,22 @@ export default function EditarHistorial({ navigation, route }) {
 
     fetchData();
   }, []);
+
+  // 🔹 Filtrar citas cuando cambie el paciente seleccionado
+  useEffect(() => {
+    if (idPaciente) {
+      const citasFiltradas = todasLasCitas.filter(
+        (cita) =>
+          String(cita.idPaciente) === String(idPaciente) &&
+          cita.estado?.toLowerCase() === "finalizada" // Solo las finalizadas
+      );
+      setCitas(citasFiltradas);
+      setIdCita(""); // Reinicia el valor de cita si se cambia el paciente
+    } else {
+      setCitas([]);
+      setIdCita("");
+    }
+  }, [idPaciente, todasLasCitas]);
 
   const handleGuardar = async () => {
     if (!idPaciente || !idCita || !diagnostico.trim()) {
@@ -134,17 +149,21 @@ export default function EditarHistorial({ navigation, route }) {
         <Picker
           selectedValue={idCita}
           onValueChange={(value) => setIdCita(value)}
-          enabled={!loading}
+          enabled={!loading && idPaciente !== ""}
           style={styles.input}
         >
-          <Picker.Item label="Seleccione una cita" value="" />
-          {citas.map((cita) => (
-            <Picker.Item
-              key={cita.id}
-              label={cita.fecha ? cita.fecha : "Sin fecha"}
-              value={String(cita.id)}
-            />
-          ))}
+          <Picker.Item label="Seleccione una cita finalizada" value="" />
+          {citas.length === 0 && idPaciente ? (
+            <Picker.Item label="No hay citas finalizadas" value="" />
+          ) : (
+            citas.map((cita) => (
+              <Picker.Item
+                key={cita.id}
+                label={`${cita.fecha}`}
+                value={String(cita.id)}
+              />
+            ))
+          )}
         </Picker>
 
         {/* Diagnóstico */}
